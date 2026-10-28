@@ -1,0 +1,282 @@
+{
+ "type": "bitacora-rutina",
+ "version": 1,
+ "name": "Torso / Pierna 4 días · v2",
+ "date": "2026-10-28",
+ "notes": "Pierna A: crunch en polea en lugar de pantorrilla (pantorrilla queda como variante).",
+ "exercises": {},
+ "days": [
+  {
+   "id": "TA",
+   "name": "Torso A",
+   "tag": "Lunes",
+   "slots": [
+    {
+     "sets": 4,
+     "reps": "8-10",
+     "rest": 90,
+     "vars": [
+      "press-banca",
+      "press-banca-mancuernas",
+      "press-pecho-maquina"
+     ]
+    },
+    {
+     "sets": 4,
+     "reps": "8-10",
+     "rest": 90,
+     "vars": [
+      "remo-barra",
+      "remo-polea",
+      "remo-mancuerna",
+      "remo-maquina"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "10-12",
+     "rest": 90,
+     "vars": [
+      "press-militar",
+      "press-militar-maquina"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "10-12",
+     "rest": 60,
+     "vars": [
+      "jalon-abierto",
+      "jalon-neutro"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "lat-mancuerna",
+      "lat-polea"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "curl-z",
+      "curl-mancuernas",
+      "curl-polea"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "triceps-cuerda",
+      "triceps-barra-polea"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "PA",
+   "name": "Pierna A",
+   "tag": "Martes",
+   "slots": [
+    {
+     "sets": 4,
+     "reps": "8-10",
+     "rest": 120,
+     "vars": [
+      "sentadilla",
+      "hack",
+      "sentadilla-smith"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "10-12",
+     "rest": 90,
+     "vars": [
+      "prensa"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "10-12",
+     "rest": 90,
+     "vars": [
+      "rumano-mancuernas",
+      "rumano-barra"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "10-12",
+     "rest": 60,
+     "vars": [
+      "curl-fem-acostado",
+      "curl-fem-sentado"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "crunch-polea",
+      "crunch-maquina",
+      "pantorrilla-pie"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "al fallo",
+     "rest": 60,
+     "vars": [
+      "piernas-colgado",
+      "crunch-inverso"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "TB",
+   "name": "Torso B",
+   "tag": "Jueves",
+   "slots": [
+    {
+     "sets": 4,
+     "reps": "8-10",
+     "rest": 90,
+     "vars": [
+      "press-inclinado",
+      "press-inclinado-barra",
+      "press-inclinado-maquina"
+     ]
+    },
+    {
+     "sets": 4,
+     "reps": "8-10",
+     "rest": 90,
+     "vars": [
+      "remo-polea",
+      "remo-mancuerna",
+      "remo-maquina",
+      "remo-barra"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "8-12",
+     "rest": 90,
+     "vars": [
+      "jalon-neutro",
+      "dominadas",
+      "jalon-abierto"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "lat-polea",
+      "lat-mancuerna"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "15",
+     "rest": 60,
+     "vars": [
+      "face-pull"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "curl-martillo",
+      "curl-martillo-cuerda"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "triceps-overhead",
+      "press-frances"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "PB",
+   "name": "Pierna B",
+   "tag": "Viernes",
+   "slots": [
+    {
+     "sets": 4,
+     "reps": "8-10",
+     "rest": 120,
+     "vars": [
+      "rumano-barra",
+      "rumano-mancuernas"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "10-12",
+     "rest": 90,
+     "vars": [
+      "hack",
+      "sentadilla",
+      "sentadilla-smith"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "10-12",
+     "rest": 90,
+     "vars": [
+      "bulgara",
+      "zancadas"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "10-12",
+     "rest": 60,
+     "vars": [
+      "curl-fem-sentado",
+      "curl-fem-acostado"
+     ]
+    },
+    {
+     "sets": 4,
+     "reps": "15-20",
+     "rest": 60,
+     "vars": [
+      "pantorrilla-sentado",
+      "pantorrilla-pie",
+      "pantorrilla-prensa"
+     ]
+    },
+    {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "crunch-polea",
+      "crunch-maquina"
+     ]
+    }
+   ]
+  }
+ ]
+}

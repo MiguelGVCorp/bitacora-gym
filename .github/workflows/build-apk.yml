@@ -26,6 +26,7 @@ jobs:
       - name: Instalar dependencias y copiar la app web a Android
         run: |
           npm ci
+          sed -i "s/const APP_VERSION = '[^']*'/const APP_VERSION = '$(cat VERSION)'/" www/index.html
           npx cap sync android
 
       - uses: actions/setup-java@v5

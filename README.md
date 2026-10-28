@@ -11,6 +11,7 @@ App de Android para registrar entrenamientos (pesos, placas, repeticiones, desca
 ## Cómo está hecha
 
 - `www/index.html`: toda la app (HTML, CSS y JS sin dependencias externas).
+- `rutinas/`: archivos de rutina que se importan desde Ajustes → Importar rutina, sin reinstalar.
 - Capacitor 8 la empaqueta como app nativa: notificación de fin de descanso con pantalla bloqueada, pantalla encendida durante la sesión, compartir respaldos.
-- `tools/build_www.py` genera `www/index.html` a partir de la versión web original (`tools/source-artifact.html`).
+- `tools/make_icons.py` genera el ícono y la pantalla de carga.
 - Cada push a `main` compila el APK firmado con GitHub Actions y lo publica en Releases.

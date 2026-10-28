@@ -291,7 +291,7 @@ h2{font-family:var(--display);font-size:20px;font-weight:700;text-transform:uppe
 <script src="js/capacitor-core.js"></script>
 <script>
 /* ---------- Plataforma (Android con Capacitor) ---------- */
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.1.0';
 const CLOUD = false;
 const CX = window.capacitorExports || null;
 const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
@@ -301,7 +301,7 @@ const safe = async fn => { try { return await fn(); } catch(e){ console.warn(e);
 
 /* ---------- Catálogo de ejercicios ----------
    u: unidad → kg | placas (número de placa en la torre) | extra (lastre en kg; vacío = peso corporal) */
-const EX = {
+const EX_BASE = {
   'press-banca':             {name:'Press de banca con barra', u:'kg'},
   'press-banca-mancuernas':  {name:'Press de banca con mancuernas', u:'kg', note:'Anota el peso de una mancuerna.'},
   'press-pecho-maquina':     {name:'Press de pecho en máquina', u:'placas'},
@@ -347,6 +347,7 @@ const EX = {
   'crunch-polea':            {name:'Crunch en polea alta con cuerda', u:'placas'},
   'crunch-maquina':          {name:'Crunch en máquina', u:'placas'}
 };
+let EX = Object.assign({}, EX_BASE);
 const UNITS = {
   kg:     {head:'Peso (kg)',   ph:'kg',     step:'0.5', im:'decimal', chip:'kg'},
   placas: {head:'Placas',      ph:'placa',  step:'1',   im:'numeric', chip:'placas'},
@@ -355,7 +356,7 @@ const UNITS = {
 const exInfo = id => EX[id] || {name: id, u:'kg'};
 
 /* ---------- Rutina: cada lugar acepta variantes ---------- */
-const ROUTINE = [
+const DEFAULT_DAYS = [
   {id:'TA', name:'Torso A', tag:'Lunes', slots:[
     [4,'8-10',90,  ['press-banca','press-banca-mancuernas','press-pecho-maquina']],
     [4,'8-10',90,  ['remo-barra','remo-polea','remo-mancuerna','remo-maquina']],
@@ -386,8 +387,25 @@ const ROUTINE = [
     [3,'10-12',60, ['curl-fem-sentado','curl-fem-acostado']],
     [4,'15-20',60, ['pantorrilla-sentado','pantorrilla-pie','pantorrilla-prensa']],
     [3,'12-15',60, ['crunch-polea','crunch-maquina']]]}
-].map(d => ({...d, slots: d.slots.map(([sets,reps,rest,vars], i) => ({key: d.id + i, sets, reps, rest, vars}))}));
-const ORDER = ROUTINE.map(d => d.id);
+];
+/* Una rutina importada usa el mismo formato: {type:'bitacora-rutina', name, exercises:{id:{name,u,note}}, days:[{id,name,tag,slots:[{sets,reps,rest,vars}]}]} */
+const toDay = d => ({id: String(d.id), name: String(d.name || d.id), tag: String(d.tag || ''), slots: (d.slots || []).map((sl, i) => Array.isArray(sl)
+  ? {key: d.id + i, sets: sl[0], reps: String(sl[1]), rest: sl[2], vars: sl[3]}
+  : {key: d.id + i, sets: Math.max(1, Math.min(10, Math.round(+sl.sets) || 3)), reps: String(sl.reps ?? '10'), rest: Math.max(15, Math.min(600, Math.round(+sl.rest) || 90)), vars: (sl.vars || []).map(String).filter(Boolean)}
+).filter(sl => sl.vars && sl.vars.length)});
+const DEFAULT_NAME = 'Torso / Pierna 4 días';
+let ROUTINE = DEFAULT_DAYS.map(toDay), ORDER = ROUTINE.map(d => d.id), ROUTINE_NAME = DEFAULT_NAME;
+function applyRoutine(r){
+  EX = Object.assign({}, EX_BASE);
+  if (r && r.exercises && typeof r.exercises === 'object') Object.entries(r.exercises).forEach(([id, e]) => {
+    if (e && e.name) EX[String(id)] = {name: String(e.name).slice(0, 80), u: ['kg','placas','extra'].includes(e.u) ? e.u : 'kg', note: e.note ? String(e.note).slice(0, 200) : undefined};
+  });
+  const days = r && Array.isArray(r.days) ? r.days.map(toDay).filter(d => d.slots.length) : [];
+  ROUTINE = days.length ? days : DEFAULT_DAYS.map(toDay);
+  ORDER = ROUTINE.map(d => d.id);
+  ROUTINE_NAME = (days.length && r.name) ? String(r.name).slice(0, 60) : DEFAULT_NAME;
+}
+function validRoutine(r){ return r && r.type === 'bitacora-rutina' && Array.isArray(r.days) && r.days.map(toDay).filter(d => d.slots.length).length > 0; }
 const dayById = id => ROUTINE.find(d => d.id === id) || ROUTINE[0];
 const slotByKey = k => { for (const d of ROUTINE) for (const s of d.slots) if (s.key === k) return s; return null; };
 
@@ -407,6 +425,8 @@ if (!Array.isArray(S.local)) S.local = [];
 if (!Array.isArray(S.pending)) S.pending = [];
 if (!S.pref || typeof S.pref !== 'object') S.pref = {};
 if (S.draft && !S.draft.slots) S.draft = null;
+if (S.routine) applyRoutine(S.routine);
+if (S.draft && !ORDER.includes(S.draft.day)) S.draft = null;
 function saveLocal(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} }
 
 let dbState = 'loading', remote = [], col = null, downloads = null, view = 'train';
@@ -646,6 +666,13 @@ function renderSettings(){
     <p class="hint" id="gStatus">${status}</p>
     ${g.models && g.models.length > 1 ? `<label class="swap" for="gModel">Modelo<select id="gModel">${g.models.map(m => `<option value="${esc(m)}" ${m === g.model ? 'selected' : ''}>${esc(m)}</option>`).join('')}</select></label>
       <p class="hint">Los modelos "lite" tienen más consultas gratis al día.</p>` : ''}
+    <h2>Rutina</h2>
+    <p class="hint"><b style="color:var(--text)">${esc(ROUTINE_NAME)}</b> · ${ROUTINE.map(d => `${esc(d.name)} (${d.slots.length})`).join(' · ')}</p>
+    <p class="hint">Cuando cambie tu rutina te mando un archivo de rutina. Lo importas aquí y listo, sin reinstalar. Tu historial no se pierde.</p>
+    <div class="tools">
+      <button class="btn" type="button" id="sRoutine">Importar rutina</button>
+      ${S.routine ? '<button class="btn" type="button" id="sRoutineReset">Volver a la original</button>' : ''}
+    </div>
     <h2>Tus datos</h2>
     <p class="hint">Todo se guarda en este celular. Exporta un respaldo cada semana y guárdalo en Drive o mándatelo por WhatsApp. Si cambias de celular, lo importas aquí.</p>
     <div class="tools">
@@ -682,6 +709,12 @@ $('#view-settings').addEventListener('click', async e => {
       if (c === 'rate_limited'){ sample = gemini; sampleState = 'ok'; }
     } finally { b.disabled = false; }
     return;
+  }
+  if (b.id === 'sRoutine') $('#importFile').click();
+  if (b.id === 'sRoutineReset'){
+    if (!(await ask('¿Volver a la rutina original de 4 días? Tu historial se conserva.', 'Volver'))) return;
+    if (draftHasData() && !(await ask('Tienes una sesión sin guardar. Si cambias de rutina se descarta.', 'Descartar y cambiar', true))) return;
+    S.routine = null; applyRoutine(null); S.draft = null; S.pref = {}; saveLocal(); renderSettings(); toast('Rutina original'); return;
   }
   if (b.id === 'sExp') exportJson();
   if (b.id === 'sImp') $('#importFile').click();
@@ -976,9 +1009,19 @@ async function offerFile(name, text){
     document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
   } catch(e){ toast('No se pudo generar el archivo.'); }
 }
+async function importRoutine(r){
+  if (!validRoutine(r)){ toast('Ese archivo de rutina no es válido.'); return; }
+  const days = r.days.map(toDay).filter(d => d.slots.length);
+  const nEx = days.reduce((a, d) => a + d.slots.length, 0);
+  if (!(await ask(`¿Cambiar a la rutina «${String(r.name || 'Nueva rutina').slice(0, 60)}»? ${days.length} días y ${nEx} ejercicios. Tu historial se conserva.`, 'Cambiar rutina'))) return;
+  if (draftHasData() && !(await ask('Tienes una sesión sin guardar. Si cambias de rutina se descarta.', 'Descartar y cambiar', true))) return;
+  S.routine = r; applyRoutine(r); S.draft = null; S.pref = {}; saveLocal();
+  if (view === 'settings') renderSettings();
+  toast('Rutina actualizada');
+}
 function exportJson(){
   const food = {profile: S.food.profile, foods: S.food.foods || {}, hidden: S.food.hidden || [], days: S.food.days || {}};
-  offerFile(`bitacora-gym-${dk(Date.now())}.json`, JSON.stringify({version: 4, exported: Date.now(), history: history().map(({_pending, ...h}) => h), food}, null, 2));
+  offerFile(`bitacora-gym-${dk(Date.now())}.json`, JSON.stringify({version: 5, exported: Date.now(), history: history().map(({_pending, ...h}) => h), food, routine: S.routine || null}, null, 2));
 }
 async function wipeAll(){
   if (!(await ask('Esto borra TODO: entrenamientos, comidas, peso, pasos y alimentos de este celular. No se puede deshacer.', 'Borrar todo', true))) return;
@@ -998,6 +1041,7 @@ $('#importFile').addEventListener('change', async e => {
   const f = e.target.files[0]; if (!f) return;
   try {
     const data = JSON.parse(await f.text());
+    if (data && data.type === 'bitacora-rutina'){ e.target.value = ''; importRoutine(data); return; }
     const incoming = Array.isArray(data) ? data : (data.history || []);
     if (!Array.isArray(incoming) && !data.food) throw 0;
     const have = new Set(history().map(h => h.id)); let added = 0, days = 0;
@@ -1007,6 +1051,7 @@ $('#importFile').addEventListener('change', async e => {
         S.local.push(rec); added++;
       }
     });
+    if (data.routine && !S.routine && validRoutine(data.routine)){ S.routine = data.routine; applyRoutine(S.routine); S.draft = null; }
     const F = data.food;
     if (F && typeof F === 'object'){
       if (F.profile && (!S.food.profile || (F.profile.updated || 0) > (S.food.profile.updated || 0))) S.food.profile = F.profile;
