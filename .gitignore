@@ -1,4 +1,5 @@
 node_modules/
 *.jks
+!android/app/bitacora-release.jks
 *.keystore
 .DS_Store

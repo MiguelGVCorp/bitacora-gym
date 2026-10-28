@@ -44,15 +44,16 @@ jobs:
             echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/bitacora.jks"
             echo "KEYSTORE_FILE=$RUNNER_TEMP/bitacora.jks" >> "$GITHUB_ENV"
           else
-            echo "::warning::Falta el secreto KEYSTORE_BASE64; se compila una versión de prueba (debug)."
+            # Llave incluida en el repositorio: mantiene la misma firma en cada versión para que las actualizaciones se instalen encima
+            echo "KEYSTORE_FILE=$GITHUB_WORKSPACE/android/app/bitacora-release.jks" >> "$GITHUB_ENV"
           fi
 
       - name: Compilar
         working-directory: android
         env:
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'B8hi_EalRv6CG62hJ7wXxiNW97ZtWVDO' }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'bitacora' }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'B8hi_EalRv6CG62hJ7wXxiNW97ZtWVDO' }}
         run: |
           chmod +x gradlew
           if [ -n "$KEYSTORE_FILE" ]; then
