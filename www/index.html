@@ -214,6 +214,11 @@ h2{font-family:var(--display);font-size:20px;font-weight:700;text-transform:uppe
 .it span:last-child{font-variant-numeric:tabular-nums;color:var(--muted)}
 .wrow{display:flex;gap:8px;margin-top:10px}
 .wrow input{flex:1;min-width:0;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.bal{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--accent-soft);font-size:14px;line-height:1.4}
+.bal b{display:block}
+.bal p{margin:2px 0 0}
+.bal p b{display:inline}
+.bal.ok{background:var(--ok-soft)}
 .wstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
 .wstats b{display:block;font-family:var(--display);font-size:24px;font-variant-numeric:tabular-nums}
 .wstats small{color:var(--muted);font-size:12px}
@@ -1230,6 +1235,51 @@ function initFoodCloud(db, id){
   flushFood();
 }
 
+/* ---- Balance semanal: sugiere cómo cuadrar si te pasaste, sin cambiar la meta normal ---- */
+const r50 = n => Math.round(n / 50) * 50;
+function weekBalance(today){
+  const T = S.food.profile.targets; let bal = 0, n = 0;
+  for (let i = 1; i <= 7; i++){
+    const d = S.food.days[dkShift(today, -i)];
+    if (d && (d.entries || []).length){ bal += totals(d).kcal - T.kcal; n++; }
+  }
+  return {bal, n};
+}
+function compPlan(excess){
+  const P = S.food.profile, T = P.targets;
+  const floor = Math.max(T.bmr || 0, P.sex === 'm' ? 1200 : 1500);
+  const maxCut = Math.max(0, Math.min(300, T.kcal - floor));
+  if (excess < 150 || maxCut < 100) return null;
+  const days = Math.min(4, Math.ceil(excess / maxCut));
+  const cut = Math.min(maxCut, Math.max(100, r50(excess / days)));
+  const kcal = T.kcal - cut, p = T.p;
+  const f = Math.max(40, Math.round(T.f - cut * 0.35 / 9));
+  const c = Math.max(50, Math.round((kcal - p * 4 - f * 9) / 4));
+  return {days, cut, kcal, p, c, f};
+}
+function balanceHTML(day, tot){
+  const P = S.food.profile; if (!P || !P.targets) return '';
+  const today = dk(Date.now()); if (day !== today) return '';
+  const T = P.targets, wb = weekBalance(today), fmt = n => r0(n).toLocaleString('es-MX');
+  const macros = pl => `proteína ${pl.p} g · carbos ${pl.c} g · grasa ${pl.f} g`;
+  const todayOver = tot.kcal - T.kcal;
+  if (todayOver > 150){
+    const pl = compPlan(Math.max(0, wb.bal) + todayOver);
+    if (!pl) return '';
+    return `<div class="bal"><b>Hoy vas ${fmt(todayOver)} kcal arriba</b><p>No pasa nada. Para cuadrarlo, ${pl.days === 1 ? 'mañana' : `los próximos ${pl.days} días`} apunta a <b>${fmt(pl.kcal)} kcal</b> (${macros(pl)}). Tu meta normal no cambia.</p></div>`;
+  }
+  if (wb.bal > 150){
+    const pl = compPlan(wb.bal);
+    if (!pl) return '';
+    const left = pl.kcal - tot.kcal;
+    return `<div class="bal"><b>Para cuadrar la semana</b><p>En los últimos días llevas ${fmt(wb.bal)} kcal arriba. Hoy te sugiero <b>${fmt(pl.kcal)} kcal</b> (${macros(pl)})${pl.days > 1 ? ` y lo mismo ${pl.days - 1 === 1 ? 'mañana' : `${pl.days - 1} días más`}` : ''}. ${left > 0 ? `Con la sugerencia te quedan ${fmt(left)} kcal.` : 'Con lo que llevas ya estás en la sugerencia.'}</p></div>`;
+  }
+  if (wb.bal < -500){
+    return `<div class="bal ok"><b>Vas por debajo esta semana</b><p>Llevas ${fmt(-wb.bal)} kcal menos que tu meta en los últimos días. Come tu meta normal; no te conviene recortar más.</p></div>`;
+  }
+  return '';
+}
+
 function weightTrend(){
   const pts = Object.values(S.food.days).filter(d => d.weight).map(d => ({k: d.date, w: +d.weight})).sort((a,b) => a.k < b.k ? -1 : 1);
   if (!pts.length) return null;
@@ -1440,6 +1490,7 @@ function renderFood(){
         <div><span class="label">Carbos</span><b>${r0(tot.c)}<small> / ${T.c} g</small></b>${bar(tot.c, T.c)}</div>
         <div><span class="label">Grasa</span><b>${r0(tot.f)}<small> / ${T.f} g</small></b>${bar(tot.f, T.f)}</div>
       </div>
+      ${balanceHTML(foodDay, tot)}
     </section>`;
 
   html += `<section class="card">
