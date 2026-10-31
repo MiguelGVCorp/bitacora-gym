@@ -710,6 +710,7 @@ async function initNative(){
   setTimeout(() => autoBackup(), 4000);
   if (SB) safe(() => SB.setStyle({style: matchMedia('(prefers-color-scheme: dark)').matches ? 'DARK' : 'LIGHT'}));
   if (LN) safe(async () => { await LN.cancel({notifications: [7001, 8001, 8002, 8003, 8004].map(id => ({id}))}); await LN.deleteChannel({id: 'descanso'}); await LN.deleteChannel({id: 'recordatorios'}); });
+  if (RA) safe(() => RA.setSound({name: S.sound || 'marimba'}));
   if (rest) scheduleRestNotif();
   if (APP){
     APP.addListener('backButton', () => {
@@ -764,8 +765,8 @@ function renderSettings(){
       <button class="btn danger" type="button" id="sWipe">Borrar todo</button>
     </div>
     <h2>Avisos de descanso</h2>
-    <p class="hint">${!IS_NATIVE ? 'El aviso con la pantalla apagada solo funciona en la app instalada.' : 'Al terminar el descanso suena una campanada propia de la app con vibración, aunque el celular esté bloqueado. No es una notificación y no baja el volumen de tu música. Suena con el volumen multimedia: si no la escuchas, súbele al volumen de medios.'}</p>
-    ${RA ? '<div class="row-btns" style="justify-content:flex-start"><button class="btn" type="button" id="testSound">Probar sonido</button></div>' : ''}
+    <p class="hint">${!IS_NATIVE ? 'El aviso con la pantalla apagada solo funciona en la app instalada.' : 'Al terminar el descanso suena el sonido que elijas aquí, con una vibración suave, aunque el celular esté bloqueado. No es una notificación y no baja el volumen de tu música. Suena con el volumen multimedia: si no la escuchas, súbele al volumen de medios.'}</p>
+    ${RA ? `<div class="wrow"><select id="soundSel" aria-label="Sonido del fin de descanso">${[['marimba', 'Marimba (do-mi-sol)'], ['kalimba', 'Kalimba (cajita de música)'], ['suave', 'Suave (dos notas cálidas)']].map(([k, l]) => `<option value="${k}" ${(S.sound || 'marimba') === k ? 'selected' : ''}>${l}</option>`).join('')}</select><button class="btn" type="button" id="testSound">Probar</button></div>` : ''}
     <p class="hint" style="margin-top:24px">Bitácora Gym · versión ${APP_VERSION}</p>`;
 }
 $('#view-settings').addEventListener('click', async e => {
@@ -799,7 +800,7 @@ $('#view-settings').addEventListener('click', async e => {
     if (draftHasData() && !(await ask('Tienes una sesión sin guardar. Si cambias de rutina se descarta.', 'Descartar y cambiar', true))) return;
     S.routine = null; applyRoutine(null); S.draft = null; S.pref = {}; saveLocal(); renderSettings(); toast('Rutina original'); return;
   }
-  if (b.id === 'testSound'){ safe(() => RA.test()); return; }
+  if (b.id === 'testSound'){ safe(() => RA.test({name: S.sound || 'marimba'})); return; }
   if (b.id === 'sExp') exportJson();
   if (b.id === 'sImp') $('#importFile').click();
   if (b.id === 'sCsv') exportCsv();
@@ -808,6 +809,7 @@ $('#view-settings').addEventListener('click', async e => {
 $('#view-settings').addEventListener('change', e => {
   const t = e.target;
   if (t.id === 'gModel'){ S.gemini.model = t.value; saveLocal(); return; }
+  if (t.id === 'soundSel'){ S.sound = t.value; saveLocal(); if (RA){ safe(() => RA.setSound({name: S.sound})); safe(() => RA.test({name: S.sound})); } return; }
   if (t.dataset.rem || t.dataset.remt){
     const k = t.dataset.rem || t.dataset.remt; S.rem = S.rem || {};
     const c = remCfg(k);

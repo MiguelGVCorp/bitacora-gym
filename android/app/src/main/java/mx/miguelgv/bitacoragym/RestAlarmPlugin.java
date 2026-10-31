@@ -51,7 +51,14 @@ public class RestAlarmPlugin extends Plugin {
 
     @PluginMethod
     public void test(PluginCall call) {
-        RestSound.done(getContext());
+        RestSound.done(getContext(), call.getString("name"));
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void setSound(PluginCall call) {
+        String name = call.getString("name", "marimba");
+        RestSound.setChosen(getContext(), name);
         call.resolve();
     }
 }

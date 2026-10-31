@@ -42,10 +42,23 @@ public final class RestSound {
         }
     }
 
-    /** Fin del descanso: dos campanadas y una vibración larga-corta-larga. */
-    public static void done(Context ctx) {
-        play(ctx, R.raw.descanso, new long[]{0, 350, 120, 120, 120, 350});
+    /** Sonido elegido en Ajustes (marimba, kalimba o suave). */
+    public static String chosen(Context ctx) {
+        return ctx.getSharedPreferences("bitacora", Context.MODE_PRIVATE).getString("sonido", "marimba");
     }
+
+    public static void setChosen(Context ctx, String name) {
+        ctx.getSharedPreferences("bitacora", Context.MODE_PRIVATE).edit().putString("sonido", name).apply();
+    }
+
+    /** Fin del descanso: el sonido elegido y una vibración suave doble. */
+    public static void done(Context ctx, String name) {
+        int id = ctx.getResources().getIdentifier("rest_" + (name == null ? chosen(ctx) : name), "raw", ctx.getPackageName());
+        if (id == 0) id = R.raw.rest_marimba;
+        play(ctx, id, new long[]{0, 140, 90, 140});
+    }
+
+    public static void done(Context ctx) { done(ctx, null); }
 
     /** Cuenta regresiva 3-2-1: un tic corto. */
     public static void tick(Context ctx) {
