@@ -338,6 +338,7 @@ const CX = window.capacitorExports || null;
 const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
 const plug = n => (CX && IS_NATIVE) ? CX.registerPlugin(n) : null;
 const LN = plug('LocalNotifications'), KA = plug('KeepAwake'), FS = plug('Filesystem'), SH = plug('Share'), APP = plug('App'), HAP = plug('Haptics'), SB = plug('StatusBar');
+const RA = plug('RestAlarm');
 const safe = async fn => { try { return await fn(); } catch(e){ console.warn(e); return null; } };
 
 /* ---------- Catálogo de ejercicios ----------
@@ -708,19 +709,8 @@ async function initNative(){
   if (!IS_NATIVE) return;
   setTimeout(() => autoBackup(), 4000);
   if (SB) safe(() => SB.setStyle({style: matchMedia('(prefers-color-scheme: dark)').matches ? 'DARK' : 'LIGHT'}));
-  if (LN){
-    const p = await safe(() => LN.checkPermissions());
-    let disp = p && p.display;
-    if (disp !== 'granted'){ const r = await safe(() => LN.requestPermissions()); disp = r && r.display; }
-    notifOK = disp === 'granted';
-    if (notifOK){
-      await safe(() => LN.createChannel({id: 'descanso', name: 'Fin del descanso', description: 'Te avisa cuando termina el descanso entre series', importance: 5, visibility: 1, vibration: true, lights: true}));
-      await safe(() => LN.createChannel({id: 'recordatorios', name: 'Recordatorios', description: 'Peso, pasos, cintura y respaldo', importance: 4, visibility: 1, vibration: true}));
-      applyReminders();
-      LN.addListener('localNotificationActionPerformed', ev => { const v = ev && ev.notification && ev.notification.extra && ev.notification.extra.view; if (v) switchView(v); });
-      if (rest) scheduleRestNotif();
-    }
-  }
+  if (LN) safe(async () => { await LN.cancel({notifications: [7001, 8001, 8002, 8003, 8004].map(id => ({id}))}); await LN.deleteChannel({id: 'descanso'}); await LN.deleteChannel({id: 'recordatorios'}); });
+  if (rest) scheduleRestNotif();
   if (APP){
     APP.addListener('backButton', () => {
       if (!$('#modal').hidden){ closeModal(false); return; }
@@ -773,11 +763,9 @@ function renderSettings(){
       <button class="btn" type="button" id="sCsv">Exportar a Excel (CSV)</button>
       <button class="btn danger" type="button" id="sWipe">Borrar todo</button>
     </div>
-    <h2>Recordatorios</h2>
-    <p class="hint">${!IS_NATIVE ? 'Los recordatorios solo funcionan en la app instalada.' : notifOK ? 'Te llegan como notificación a la hora que elijas.' : 'Activa las notificaciones de la app en Android para recibirlos.'}</p>
-    ${Object.keys(REM).map(k => { const r = REM[k], c = remCfg(k); return `<div class="rem-row"><label for="rem-${k}"><input type="checkbox" id="rem-${k}" data-rem="${k}" ${c.on ? 'checked' : ''}> ${r.label} <small>${r.when}</small></label><input type="time" id="remt-${k}" data-remt="${k}" value="${pad(c.h)}:${pad(c.m)}" aria-label="Hora para ${r.label}"></div>`; }).join('')}
     <h2>Avisos de descanso</h2>
-    <p class="hint">${!IS_NATIVE ? 'Los avisos con la pantalla apagada solo funcionan en la app instalada.' : notifOK ? 'Activos: al terminar el descanso el celular suena y vibra aunque esté bloqueado.' : 'Desactivados. Activa las notificaciones de Bitácora Gym en los ajustes de Android para que te avise con la pantalla apagada.'}</p>
+    <p class="hint">${!IS_NATIVE ? 'El aviso con la pantalla apagada solo funciona en la app instalada.' : 'Al terminar el descanso suena una campanada propia de la app con vibración, aunque el celular esté bloqueado. No es una notificación y no baja el volumen de tu música. Suena con el volumen multimedia: si no la escuchas, súbele al volumen de medios.'}</p>
+    ${RA ? '<div class="row-btns" style="justify-content:flex-start"><button class="btn" type="button" id="testSound">Probar sonido</button></div>' : ''}
     <p class="hint" style="margin-top:24px">Bitácora Gym · versión ${APP_VERSION}</p>`;
 }
 $('#view-settings').addEventListener('click', async e => {
@@ -811,6 +799,7 @@ $('#view-settings').addEventListener('click', async e => {
     if (draftHasData() && !(await ask('Tienes una sesión sin guardar. Si cambias de rutina se descarta.', 'Descartar y cambiar', true))) return;
     S.routine = null; applyRoutine(null); S.draft = null; S.pref = {}; saveLocal(); renderSettings(); toast('Rutina original'); return;
   }
+  if (b.id === 'testSound'){ safe(() => RA.test()); return; }
   if (b.id === 'sExp') exportJson();
   if (b.id === 'sImp') $('#importFile').click();
   if (b.id === 'sCsv') exportCsv();
@@ -1009,13 +998,12 @@ let rest = null;
 const REST_NID = 7001;
 function saveRest(){ S.rest = rest; saveLocal(); }
 async function scheduleRestNotif(){
-  if (!LN || !notifOK) return;
-  await safe(() => LN.cancel({notifications: [{id: REST_NID}]}));
-  if (!rest || rest.end <= Date.now() + 1000) return;
-  await safe(() => LN.schedule({notifications: [{id: REST_NID, title: '¡A darle!', body: rest.label, channelId: 'descanso', smallIcon: 'ic_stat_timer', schedule: {at: new Date(rest.end), allowWhileIdle: true}}]}));
+  if (!RA) return;
+  if (!rest || rest.end <= Date.now() + 300){ await safe(() => RA.cancel()); return; }
+  await safe(() => RA.schedule({at: rest.end}));
 }
 function startRest(sec, label){ rest = {end: Date.now() + sec*1000, total: sec, label, beeped: false}; $('#restbar').classList.add('show'); $('#restbar').classList.remove('over'); saveRest(); scheduleRestNotif(); tick(); }
-function stopRest(){ const had = !!rest; rest = null; $('#restbar').classList.remove('show','over'); if (had) saveRest(); if (LN && notifOK) safe(() => LN.cancel({notifications: [{id: REST_NID}]})); }
+function stopRest(){ const had = !!rest; rest = null; $('#restbar').classList.remove('show','over'); if (had) saveRest(); if (RA) safe(() => RA.cancel()); }
 function onRestTap(e){
   const b = e.target.closest && e.target.closest('button[data-rest]');
   if (!b){ if ($('#restbar').classList.contains('over')) stopRest(); return; }
@@ -1031,8 +1019,8 @@ $('#restbar').addEventListener('click', onRestTap);
 let actx = null;
 function unlockAudio(){ try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); } catch(e){} }
 function beep(){
+  if (RA) return; // la alarma nativa ya suena y vibra a la hora exacta
   if (HAP) safe(() => HAP.vibrate({duration: 450}));
-  if (notifOK) return;
   try {
     if (actx){
       [0, .28, .56].forEach(off => {
@@ -1054,9 +1042,11 @@ document.addEventListener('visibilitychange', () => {
 });
 
 function countdownTick(){
-  if (HAP) safe(() => HAP.vibrate({duration: 60}));
   const bar = $('#restbar'); bar.classList.remove('cd'); void bar.offsetWidth; bar.classList.add('cd');
-  if (document.visibilityState !== 'visible' || !actx) return;
+  if (document.visibilityState !== 'visible') return;
+  if (RA){ safe(() => RA.tick()); return; }
+  if (HAP) safe(() => HAP.vibrate({duration: 60}));
+  if (!actx) return;
   try {
     const o = actx.createOscillator(), g = actx.createGain(), t0 = actx.currentTime;
     o.type = 'sine'; o.frequency.value = 660; o.connect(g); g.connect(actx.destination);
@@ -1114,7 +1104,7 @@ function summaryText(m){
   const L = [`Resumen Bitácora Gym · semana ${weekRangeLabel(m.w)}`];
   L.push(`Entrenamientos: ${m.ses} de ${m.target}${m.dur ? ` (prom. ${Math.round(m.dur)} min)` : ''}.${m.prs.length ? ' Récords: ' + m.prs.map(p => `${exInfo(p.ex).name} ${fmtSet(p, exInfo(p.ex).u)}`).join(', ') + '.' : ''}`);
   if (m.logged) L.push(`Comida: ${m.logged} días registrados, prom. ${r0(m.kcal).toLocaleString('es-MX')} kcal${m.kcalT ? ` (meta ${m.kcalT.toLocaleString('es-MX')})` : ''}; proteína cumplida ${m.protOk} de ${m.logged} días${m.protT ? ` (meta ${m.protT} g)` : ''}.`);
-  if (m.wt != null) L.push(`Peso: ${m.wt.toFixed(1)} kg prom.${m.wtDiff != null ? ` (${sgn(m.wtDiff)} kg vs semana anterior)` : ''}.${m.waist != null ? ` Cintura: ${m.waist} cm${m.waistDiff != null ? ` (${sgn(m.waistDiff)})` : ''}.` : ''}`);
+  if (m.wt != null) L.push(`Peso: ${m.wt.toFixed(1)} kg prom.${m.wtDiff != null ? ` (${sgn(m.wtDiff)} kg vs semana anterior)` : ''}.`);
   if (m.stepsN) L.push(`Pasos: ${r0(m.steps).toLocaleString('es-MX')} prom., ${m.stepsOk} de ${m.stepsN} días con ${STEP_GOAL.toLocaleString('es-MX')}+.`);
   return L.join('\n');
 }
@@ -1130,7 +1120,7 @@ function summaryHTML(){
       ${cell(m.logged ? `${m.protOk}/${m.logged}` : '–', 'días con tu proteína')}
       ${cell(m.wt != null ? m.wt.toFixed(1) : '–', `kg prom.${m.wtDiff != null ? ' (' + sgn(m.wtDiff) + ')' : ''}`)}
       ${cell(m.stepsN ? r0(m.steps).toLocaleString('es-MX') : '–', `pasos prom. (${m.stepsOk}/${m.stepsN} con meta)`)}
-      ${cell(m.waist != null ? m.waist : '–', `cintura cm${m.waistDiff != null ? ' (' + sgn(m.waistDiff) + ')' : ''}`)}
+      ${cell(m.prs.length || '–', 'récords nuevos')}
     </div>
     ${m.prs.length ? `<p class="hint">Récords: ${m.prs.map(p => `${esc(exInfo(p.ex).name)} ${fmtSet(p, exInfo(p.ex).u)}`).join(' · ')}</p>` : ''}
     <div class="row-btns"><button class="btn" type="button" id="sumShare">Compartir resumen</button><button class="btn primary" type="button" id="sumBackup">Exportar respaldo</button></div>
@@ -1228,7 +1218,7 @@ async function importRoutine(r){
 }
 function backupJSON(){
   const food = {profile: S.food.profile, foods: S.food.foods || {}, hidden: S.food.hidden || [], days: S.food.days || {}};
-  return JSON.stringify({version: 6, exported: Date.now(), history: history().map(({_pending, ...h}) => h), food, routine: S.routine || null, rem: S.rem || null, cycleStart: S.cycleStart || null}, null, 2);
+  return JSON.stringify({version: 6, exported: Date.now(), history: history().map(({_pending, ...h}) => h), food, routine: S.routine || null, cycleStart: S.cycleStart || null}, null, 2);
 }
 function exportJson(){ offerFile(`bitacora-gym-${dk(Date.now())}.json`, backupJSON()); }
 async function autoBackup(force){
@@ -1290,7 +1280,6 @@ $('#importFile').addEventListener('change', async e => {
     });
     if (data.routine && !S.routine && validRoutine(data.routine)){ S.routine = data.routine; applyRoutine(S.routine); S.draft = null; }
     if (data.cycleStart && !S.cycleStart) S.cycleStart = data.cycleStart;
-    if (data.rem && !S.rem){ S.rem = data.rem; applyReminders(); }
     const F = data.food;
     if (F && typeof F === 'object'){
       if (F.profile && (!S.food.profile || (F.profile.updated || 0) > (S.food.profile.updated || 0))) S.food.profile = F.profile;
@@ -1339,23 +1328,18 @@ function miniChart(pts, unit){
 }
 function bodyHTML(){
   const today = dk(Date.now()), doc = dayDoc(today);
-  const ws = Object.values(S.food.days || {}).filter(d => d.waist).map(d => ({k: d.date, v: +d.waist})).sort((a, b) => a.k < b.k ? -1 : 1);
-  const first = ws[0], last = ws[ws.length - 1];
-  const wAvg = weekAvgOf('weight', today);
+  const wAvg = weekAvgOf('weight', today), wPrev = weekAvgOf('weight', dkShift(today, -7));
   const photos = S.photos || [], dates = [...new Set(photos.map(p => p.date))].sort();
   const firstSet = dates.length ? photos.filter(p => p.date === dates[0]) : [];
   const lastSet = dates.length > 1 ? photos.filter(p => p.date === dates[dates.length - 1]) : [];
   return `<section class="card body-card">
-    <h3>Cuerpo</h3>
+    <h3>Peso y fotos</h3>
     <div class="stats">
       <div class="stat"><b>${wAvg ? wAvg.toFixed(1) : '–'}</b><small>peso prom. 7 días (kg)</small></div>
-      <div class="stat"><b>${last ? last.v : '–'}</b><small>cintura (cm)${last ? ' · ' + dShort(dkParse(last.k)) : ''}</small></div>
-      <div class="stat"><b>${first && last && ws.length > 1 ? ((last.v - first.v) > 0 ? '+' : '') + (Math.round((last.v - first.v) * 10) / 10) : '–'}</b><small>cintura desde el inicio</small></div>
+      <div class="stat"><b>${wPrev != null && wAvg != null ? sgn(wAvg - wPrev) : '–'}</b><small>kg vs semana anterior</small></div>
+      <div class="stat"><b>${(S.photos || []).length ? dates.length : '–'}</b><small>días con fotos</small></div>
     </div>
-    <p class="hint">Mide tu cintura una vez por semana, en ayunas y a la altura del ombligo. Si baja, estás perdiendo grasa aunque la báscula casi no se mueva.</p>
-    <div class="wrow"><input id="waistIn" type="number" inputmode="decimal" step="0.5" min="40" max="200" placeholder="Cintura de hoy (cm)" value="${doc.waist ?? ''}" aria-label="Cintura de hoy en cm"><button class="btn" type="button" id="waistSave">${doc.waist ? 'Actualizar' : 'Guardar'}</button></div>
-    ${ws.length >= 2 ? miniChart(ws, 'cm') : ''}
-    <h3 style="margin-top:18px">Fotos de progreso</h3>
+    <h3 style="margin-top:14px">Fotos de progreso</h3>
     <p class="hint">De frente, de lado y de espalda, con la misma luz y a la misma hora. Se guardan solo en tu celular (no van en el respaldo).</p>
     <div class="row-btns" style="justify-content:flex-start"><button class="btn primary" type="button" id="photoAdd">Agregar fotos de hoy</button>${photos.length ? `<button class="link" type="button" id="photoToggle">${showPhotos ? 'Ocultar' : `Ver todas (${dates.length} ${dates.length === 1 ? 'día' : 'días'})`}</button>` : ''}</div>
     ${lastSet.length ? `<div class="cmp"><div><small>Inicio · ${dShort(dkParse(dates[0]))}</small>${firstSet.map(imgTag).join('')}</div><div><small>Última · ${dShort(dkParse(dates[dates.length - 1]))}</small>${lastSet.map(imgTag).join('')}</div></div>` : firstSet.length ? `<div class="gal">${firstSet.map(imgTag).join('')}</div>` : ''}

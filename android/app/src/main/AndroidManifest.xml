@@ -27,6 +27,8 @@
         <!-- Descarga el escáner de códigos de barras de Google al instalar la app -->
         <meta-data android:name="com.google.mlkit.vision.DEPENDENCIES" android:value="barcode_ui" />
 
+        <receiver android:name=".RestAlarmReceiver" android:exported="false" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
