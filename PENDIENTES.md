@@ -1,30 +1,16 @@
 # Pendientes para próximas versiones
 
-Ideas acordadas con Miguel para agregar más adelante. Ninguna está hecha todavía.
+## Hecho en la versión 2.0 (31 oct 2026)
+- Entrenamiento: aviso de "sube peso", calentamiento sugerido, récords personales, semana de descarga automática (semana 8 del ciclo) y cuenta regresiva 3-2-1.
+- Comida: guardar como planeado, ajustar porción, mover a otro día (hasta 7 días adelante) y escáner de código de barras con Open Food Facts.
+- Progreso: cintura semanal con gráfica, fotos de progreso con comparación inicio/última, resumen de la semana compartible y recordatorios (peso, pasos, cintura y fotos, resumen y respaldo).
+- Datos: copia automática semanal en Documentos/BitacoraGym del celular (se conservan las 4 más recientes).
 
-## Comida
-- **Guardar como "planeado"**: registrar la comida al pesarla sin que sume a las calorías del día. Se ve en gris con un botón "Ya me lo comí"; solo cuenta al confirmarla.
-- **Ajustar porción**: marcar que solo se comió ½ o ¾ de lo registrado y recalcular calorías y macros.
-- **Mover a otro día**: pasar una comida preparada hoy al día siguiente sin capturarla de nuevo.
-- **Escáner de código de barras**: leer productos empaquetados (yogurt, tostadas, atún) con Open Food Facts, gratis y sin IA.
-
-## Entrenamiento
-- **Aviso de "sube peso"** (prioridad): cuando se completa el tope del rango en todas las series, la tarjeta dice el peso sugerido para la próxima vez (+2.5 kg torso, +5 kg pierna, +1 placa en máquinas).
-- **Calentamiento sugerido** en ejercicios pesados: series de aproximación calculadas desde el peso de trabajo.
-- **Récords personales**: aviso al superar la mejor marca (peso o 1RM estimado) de un ejercicio.
-- **Semana de descarga automática**: en la semana 8 proponer la versión ligera de la rutina (mitad de series, algo menos de peso).
-- **Cuenta regresiva 3-2-1** con vibración al final del descanso.
-
-## Progreso
-- **Cintura y fotos de progreso** (prioridad): registro semanal de cintura (a la altura del ombligo) y fotos de frente, lado y espalda guardadas en la app, con comparación entre semanas.
-- **Resumen del domingo** (prioridad): entrenamientos hechos de 4, promedio de calorías, días con proteína cumplida, peso promedio y cambio, pasos promedio y récords nuevos, con botón para compartirlo con Claude.
-- **Recordatorios**: pesarse en la mañana, anotar pasos en la noche, exportar respaldo los domingos.
-
-## Datos
-- **Copia automática a Google Drive**: para que Claude pueda revisar los datos sin exportar el respaldo a mano.
+## Pendiente
+- **Copia automática a Google Drive**: requiere crear un cliente OAuth de Google (Google Cloud Console, con la huella SHA-1 de la llave de firma) para que la app pueda iniciar sesión con Google y subir archivos. Mientras tanto: recordatorio del domingo + Exportar respaldo → Drive.
 
 ## Calendario de revisiones (desde el 26 oct 2026)
 - 15 nov: revisar meta de calorías con 3 semanas de datos.
 - 22 nov: actualizar el peso en el perfil.
-- 21-27 dic: semana de descarga.
+- 21-27 dic: semana de descarga (la app la propone sola desde la semana 8).
 - Mediados de enero: revisión de rutina y objetivo (se entrega como archivo de rutina).

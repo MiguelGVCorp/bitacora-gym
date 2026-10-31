@@ -1,13 +1,14 @@
 {
   "name": "bitacora-gym",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
-  "description": "Bitácora de gym y comida para Android",
+  "description": "Bit\u00e1cora de gym y comida para Android",
   "scripts": {
     "sync": "cap sync android"
   },
   "dependencies": {
     "@capacitor-community/keep-awake": "8.0.1",
+    "@capacitor-mlkit/barcode-scanning": "8.2.1",
     "@capacitor/android": "8.5.3",
     "@capacitor/app": "8.1.2",
     "@capacitor/core": "8.5.3",
