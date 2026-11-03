@@ -89,6 +89,8 @@ a.link{display:inline-block;text-decoration:none}
 .meta{color:var(--muted);font-size:13px;margin-top:2px;font-variant-numeric:tabular-nums}
 .prev{font-size:13px;color:var(--muted);background:var(--surface-2);border-radius:8px;padding:6px 9px;margin:10px 0 8px;font-variant-numeric:tabular-nums}
 .prev b{color:var(--text);font-weight:600}
+.goal{font-size:13px;color:var(--text);border:1.5px solid var(--accent);border-radius:8px;padding:6px 9px;margin:0 0 8px;line-height:1.35}
+.goal b{color:var(--accent)}
 .set-head,.set{display:grid;grid-template-columns:30px minmax(0,1fr) minmax(0,1fr) 46px;gap:8px;align-items:center}
 .set-head{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;padding:0 0 4px}
 .set{padding:4px 0}
@@ -342,7 +344,7 @@ const RA = plug('RestAlarm');
 const safe = async fn => { try { return await fn(); } catch(e){ console.warn(e); return null; } };
 
 /* ---------- Catálogo de ejercicios ----------
-   u: unidad → kg | placas (número de placa en la torre) | extra (lastre en kg; vacío = peso corporal) */
+   u: unidad → kg | lb | placas (número de placa en la torre) | extra (lastre en kg; vacío = peso corporal) */
 const EX_BASE = {
   'press-banca':             {name:'Press de banca con barra', u:'kg'},
   'press-banca-mancuernas':  {name:'Press de banca con mancuernas', u:'kg', note:'Anota el peso de una mancuerna.'},
@@ -359,7 +361,7 @@ const EX_BASE = {
   'lat-mancuerna':           {name:'Elevaciones laterales con mancuernas', u:'kg'},
   'lat-polea':               {name:'Elevaciones laterales en polea', u:'placas'},
   'face-pull':               {name:'Face pull en polea', u:'placas'},
-  'curl-z':                  {name:'Curl con barra Z', u:'kg', note:'Barras fijas de 10, 15, 20, 25 y 30: anota el número de la barra.'},
+  'curl-z':                  {name:'Curl con barra Z', u:'lb', note:'Barras fijas de 10, 15, 20, 25 y 30 lb: anota el número de la barra.'},
   'curl-mancuernas':         {name:'Curl con mancuernas', u:'kg'},
   'curl-polea':              {name:'Curl en polea', u:'placas'},
   'curl-martillo':           {name:'Curl martillo con mancuernas', u:'kg'},
@@ -367,10 +369,10 @@ const EX_BASE = {
   'triceps-cuerda':          {name:'Extensión de tríceps en polea con cuerda', u:'placas'},
   'triceps-barra-polea':     {name:'Extensión de tríceps en polea con barra', u:'placas'},
   'triceps-overhead':        {name:'Extensión de tríceps sobre la cabeza en polea', u:'placas'},
-  'press-frances':           {name:'Press francés con barra Z', u:'kg', note:'Barras fijas de 10, 15, 20, 25 y 30: anota el número de la barra.'},
+  'press-frances':           {name:'Press francés con barra Z', u:'lb', note:'Barras fijas de 10, 15, 20, 25 y 30 lb: anota el número de la barra.'},
   'press-inclinado':         {name:'Press inclinado con mancuernas', u:'kg', note:'Anota el peso de una mancuerna.'},
   'press-inclinado-barra':   {name:'Press inclinado con barra', u:'kg'},
-  'press-inclinado-maquina': {name:'Press inclinado en máquina', u:'placas'},
+  'press-inclinado-maquina': {name:'Press inclinado en máquina', u:'kg', note:'Anota el peso total de la máquina.'},
   'sentadilla':              {name:'Sentadilla libre', u:'kg'},
   'hack':                    {name:'Sentadilla en máquina Hack', u:'kg'},
   'sentadilla-smith':        {name:'Sentadilla en máquina Smith', u:'kg'},
@@ -392,6 +394,7 @@ const EX_BASE = {
 let EX = Object.assign({}, EX_BASE);
 const UNITS = {
   kg:     {head:'Peso (kg)',   ph:'kg',     step:'0.5', im:'decimal', chip:'kg'},
+  lb:     {head:'Peso (lb)',   ph:'lb',     step:'0.5', im:'decimal', chip:'lb'},
   placas: {head:'Placas',      ph:'placa',  step:'1',   im:'numeric', chip:'placas'},
   extra:  {head:'Lastre (kg)', ph:'PC',     step:'0.5', im:'decimal', chip:'peso corporal'}
 };
@@ -436,16 +439,27 @@ const toDay = d => ({id: String(d.id), name: String(d.name || d.id), tag: String
   : {key: d.id + i, sets: Math.max(1, Math.min(10, Math.round(+sl.sets) || 3)), reps: String(sl.reps ?? '10'), rest: Math.max(15, Math.min(600, Math.round(+sl.rest) || 90)), vars: (sl.vars || []).map(String).filter(Boolean)}
 ).filter(sl => sl.vars && sl.vars.length)});
 const DEFAULT_NAME = 'Torso / Pierna 4 días';
-let ROUTINE = DEFAULT_DAYS.map(toDay), ORDER = ROUTINE.map(d => d.id), ROUTINE_NAME = DEFAULT_NAME;
+let ROUTINE = DEFAULT_DAYS.map(toDay), ORDER = ROUTINE.map(d => d.id), ROUTINE_NAME = DEFAULT_NAME, TARGETS = null, TARGETS_FROM = 0;
 function applyRoutine(r){
   EX = Object.assign({}, EX_BASE);
   if (r && r.exercises && typeof r.exercises === 'object') Object.entries(r.exercises).forEach(([id, e]) => {
-    if (e && e.name) EX[String(id)] = {name: String(e.name).slice(0, 80), u: ['kg','placas','extra'].includes(e.u) ? e.u : 'kg', note: e.note ? String(e.note).slice(0, 200) : undefined};
+    if (e && e.name) EX[String(id)] = {name: String(e.name).slice(0, 80), u: ['kg','lb','placas','extra'].includes(e.u) ? e.u : 'kg', note: e.note ? String(e.note).slice(0, 200) : undefined};
   });
   const days = r && Array.isArray(r.days) ? r.days.map(toDay).filter(d => d.slots.length) : [];
   ROUTINE = days.length ? days : DEFAULT_DAYS.map(toDay);
   ORDER = ROUTINE.map(d => d.id);
   ROUTINE_NAME = (days.length && r.name) ? String(r.name).slice(0, 60) : DEFAULT_NAME;
+  TARGETS = r && r.targets && typeof r.targets === 'object' ? r.targets : null;
+  const m = r && String(r.targetsFrom || r.date || '').match(/^(\d{4})-(\d{2})-(\d{2})/);
+  TARGETS_FROM = m ? new Date(+m[1], +m[2] - 1, +m[3]).getTime() : 0;
+}
+/* Meta de hoy: vale hasta que guardes una sesión de ese día después de la fecha de las metas */
+function targetFor(dayId, exId){
+  if (!TARGETS || isDeload()) return null;
+  const t = TARGETS[dayId] && TARGETS[dayId][exId]; if (!t) return null;
+  if (history().some(h => h.day === dayId && h.date >= TARGETS_FROM)) return null;
+  const w = t.w == null || t.w === '' ? null : num(t.w), r = num(t.r);
+  return (w == null && r == null) ? null : {w, r};
 }
 function validRoutine(r){ return r && r.type === 'bitacora-rutina' && Array.isArray(r.days) && r.days.map(toDay).filter(d => d.slots.length).length > 0; }
 const dayById = id => ROUTINE.find(d => d.id === id) || ROUTINE[0];
@@ -490,7 +504,7 @@ const num = v => { const n = parseFloat(String(v).replace(',','.')); return isFi
 function fmtW(w, u){
   if (w == null || (u === 'extra' && !w)) return u === 'extra' ? 'PC' : '–';
   const n = (Math.round(w*10)/10).toString();
-  return u === 'placas' ? n + ' pl' : u === 'extra' ? '+' + n : n;
+  return u === 'placas' ? n + ' pl' : u === 'lb' ? n + ' lb' : u === 'extra' ? '+' + n : n;
 }
 const fmtSet = (s, u) => `${fmtW(s.w, u)}×${s.r ?? '–'}`;
 const dShort = ts => new Date(ts).toLocaleDateString('es-MX', {day:'numeric', month:'short'});
@@ -708,6 +722,7 @@ let notifOK = false;
 async function initNative(){
   if (!IS_NATIVE) return;
   setTimeout(() => autoBackup(), 4000);
+  setTimeout(() => checkRemoteRoutine(true), 1500);
   if (SB) safe(() => SB.setStyle({style: matchMedia('(prefers-color-scheme: dark)').matches ? 'DARK' : 'LIGHT'}));
   if (LN) safe(async () => { await LN.cancel({notifications: [7001, 8001, 8002, 8003, 8004].map(id => ({id}))}); await LN.deleteChannel({id: 'descanso'}); await LN.deleteChannel({id: 'recordatorios'}); });
   if (RA) safe(() => RA.setSound({name: S.sound || 'marimba'}));
@@ -721,6 +736,7 @@ async function initNative(){
     APP.addListener('appStateChange', st => {
       if (!st || !st.isActive) return;
       autoBackup();
+      checkRemoteRoutine();
       tick();
       if (S.draft && S.draft.start) requestWake();
       if (view === 'train') renderTrain();
@@ -750,7 +766,7 @@ function renderSettings(){
       <p class="hint">Los modelos "lite" tienen más consultas gratis al día.</p>` : ''}
     <h2>Rutina</h2>
     <p class="hint"><b style="color:var(--text)">${esc(ROUTINE_NAME)}</b> · ${ROUTINE.map(d => `${esc(d.name)} (${d.slots.length})`).join(' · ')}</p>
-    <p class="hint">Cuando cambie tu rutina te mando un archivo de rutina. Lo importas aquí y listo, sin reinstalar. Tu historial no se pierde.</p>
+    <p class="hint">La rutina y tus metas de cada semana se actualizan solas al abrir la app (si tienes internet). También puedes importar un archivo de rutina. Tu historial no se pierde.</p>
     <div class="tools">
       <button class="btn" type="button" id="sRoutine">Importar rutina</button>
       ${S.routine ? '<button class="btn" type="button" id="sRoutineReset">Volver a la original</button>' : ''}
@@ -845,11 +861,13 @@ function renderTrain(){
     const prev = lastFor(st.v);
     const hint = !isDeload() && progressHint(sl, st.v, prev, D.day);
     const prevTop = prev ? Math.max(...prev.sets.map(s => s.w || 0)) : 0;
-    const wPh = p => { if (!p || p.w == null) return U.ph; if (hint) return hint.to; if (isDeload() && ex.u !== 'extra') return roundTo(p.w * 0.9, ex.u === 'placas' ? 1 : 2.5); return p.w; };
+    const tgt = targetFor(D.day, st.v);
+    const wPh = p => { if (tgt) return tgt.w != null ? tgt.w : U.ph; if (!p || p.w == null) return U.ph; if (hint) return hint.to; if (isDeload() && ex.u !== 'extra') return roundTo(p.w * 0.9, ex.u === 'placas' ? 1 : 2.5); return p.w; };
     const rows = st.sets;
     const prevTxt = prev
       ? `<div class="prev">Última vez (${dShort(prev.date)}): <b>${prev.sets.map(s => fmtSet(s, ex.u)).join(' · ')}</b>${hint ? `<div class="up">↑ Completaste ${sl.sets}×${hint.top}: hoy sube a <b>${fmtW(hint.to, ex.u)}${ex.u === 'kg' ? ' kg' : ''}</b></div>` : ''}</div>`
       : `<div class="prev">${dbState === 'loading' ? 'Cargando tu historial…' : 'Sin registros de este ejercicio. Elige un peso que te deje en el rango con 1-2 reps en reserva.'}</div>`;
+    const tgtTxt = tgt ? `<div class="goal">🎯 Meta de hoy: <b>${tgt.w != null ? fmtW(tgt.w, ex.u) + (ex.u === 'kg' ? ' kg' : '') : 'peso corporal'} × ${tgt.r ?? esc(sl.reps)}</b> en cada serie. Ya viene puesta: solo toca ✓ (si te salen otras reps, cámbialas antes).</div>` : '';
     const swap = sl.vars.length > 1
       ? `<label class="swap" for="sw-${sl.key}">Cambiar
           <select id="sw-${sl.key}" data-swap="${sl.key}">${sl.vars.map(v => `<option value="${v}" ${v === st.v ? 'selected' : ''}>${esc(exInfo(v).name)}</option>`).join('')}</select>
@@ -860,14 +878,15 @@ function renderTrain(){
       ${ex.note ? `<div class="exnote">${esc(ex.note)}</div>` : ''}
       ${swap}
       ${prevTxt}
-      ${si < 2 ? warmupHTML(st.v, hint ? hint.to : prevTop) : ''}
+      ${tgtTxt}
+      ${si < 2 ? warmupHTML(st.v, tgt && tgt.w ? tgt.w : hint ? hint.to : prevTop) : ''}
       <div class="set-head"><span></span><span>${U.head}</span><span>Reps</span><span></span></div>
       ${rows.map((s,i) => {
         const p = prev && prev.sets[Math.min(i, prev.sets.length-1)];
         return `<div class="set${s.done ? ' done' : ''}" data-i="${i}">
           <span class="n">${i+1}</span>
           <input type="number" inputmode="${U.im}" step="${U.step}" min="0" id="w-${sl.key}-${i}" data-f="w" value="${esc(s.w)}" placeholder="${wPh(p)}" aria-label="${U.head} serie ${i+1}">
-          <input type="number" inputmode="numeric" step="1" min="0" id="r-${sl.key}-${i}" data-f="r" value="${esc(s.r)}" placeholder="${p && p.r != null ? p.r : esc(sl.reps)}" aria-label="Repeticiones serie ${i+1}">
+          <input type="number" inputmode="numeric" step="1" min="0" id="r-${sl.key}-${i}" data-f="r" value="${esc(s.r)}" placeholder="${tgt && tgt.r != null ? tgt.r : p && p.r != null ? p.r : esc(sl.reps)}" aria-label="Repeticiones serie ${i+1}">
           <button class="check" type="button" aria-label="Marcar serie ${i+1}" aria-pressed="${s.done}">✓</button>
         </div>`;}).join('')}
       <div class="card-actions">
@@ -916,6 +935,7 @@ async function finishSession(){
   flushPending();
   toast(prs.length ? `Sesión guardada · ${prs.length} ${prs.length === 1 ? 'récord' : 'récords'} nuevo${prs.length === 1 ? '' : 's'}` : 'Sesión guardada');
   renderTrain(); switchView('history');
+  setTimeout(() => checkRemoteRoutine(true), 3000);
 }
 
 $('#view-train').addEventListener('change', async e => {
@@ -1073,7 +1093,7 @@ function tick(){
 setInterval(tick, 250);
 
 /* ---------- Historial ---------- */
-function volumeOf(h){ let v = 0; for (const [id, a] of Object.entries(h.sets)) if (exInfo(id).u === 'kg') for (const s of a) v += (s.w||0)*(s.r||0); return Math.round(v); }
+function volumeOf(h){ let v = 0; for (const [id, a] of Object.entries(h.sets)) { const u = exInfo(id).u, k = u === 'kg' ? 1 : u === 'lb' ? 0.4536 : 0; if (k) for (const s of a) v += (s.w||0)*(s.r||0)*k; } return Math.round(v); }
 let sumWeek = 0;
 function weekRange(offset){
   const d = new Date(); d.setHours(0, 0, 0, 0);
@@ -1217,6 +1237,26 @@ async function importRoutine(r){
   S.routine = r; applyRoutine(r); S.draft = null; S.pref = {}; saveLocal();
   if (view === 'settings') renderSettings();
   toast('Rutina actualizada');
+}
+/* Rutina y metas de la semana: se actualizan solas desde el repositorio */
+const ROUTINE_URL = 'https://raw.githubusercontent.com/MiguelGVCorp/bitacora-gym/main/rutinas/actual.json';
+let routineCheckAt = 0;
+async function checkRemoteRoutine(force){
+  if (!force && Date.now() - routineCheckAt < 10 * 60e3) return;
+  routineCheckAt = Date.now();
+  try {
+    const res = await fetch(ROUTINE_URL + '?t=' + Date.now(), {cache: 'no-store'});
+    if (!res.ok) return;
+    const r = await res.json();
+    if (!validRoutine(r) || S.routineAuto === false) return;
+    const cur = S.routine || {};
+    if ((+r.rev || 0) <= (+cur.rev || 0)) return;
+    if (draftHasData()) return; // en plena sesión no se cambia nada; se aplica en la siguiente revisión
+    S.routine = r; applyRoutine(r); S.draft = null; saveLocal();
+    if (view === 'train') renderTrain();
+    if (view === 'settings') renderSettings();
+    toast(r.targets ? 'Rutina actualizada: ya tienes tus metas de la semana' : 'Rutina actualizada');
+  } catch(e){ console.warn('rutina', e); }
 }
 function backupJSON(){
   const food = {profile: S.food.profile, foods: S.food.foods || {}, hidden: S.food.hidden || [], days: S.food.days || {}};
@@ -1422,7 +1462,7 @@ function renderProgress(){
     const best = pts.reduce((b,p) => p.e1rm > b.e1rm ? p : b, pts[0]);
     const first = pts[0], last = pts[pts.length-1];
     const diff = (last.top.w||0) - (first.top.w||0);
-    const unitTxt = u === 'placas' ? ' pl' : ' kg';
+    const unitTxt = u === 'placas' ? ' pl' : u === 'lb' ? ' lb' : ' kg';
     html += `<div class="stats">
       <div class="stat"><b>${fmtW(last.top.w, u)}${u === 'kg' ? ' kg' : ''}</b><small>último top set ×${last.top.r ?? '–'}</small></div>
       <div class="stat"><b>${Math.round(best.e1rm)}${unitTxt}</b><small>1RM estimado (mejor)</small></div>
@@ -1452,7 +1492,7 @@ function chartSvg(pts, u){
   const labIdx = pts.length <= 6 ? pts.map((_,i) => i) : [0, Math.floor((pts.length-1)/2), pts.length-1];
   labIdx.forEach(i => g += `<text x="${x(i).toFixed(1)}" y="${H-8}" text-anchor="${pts.length > 1 && i === 0 ? 'start' : pts.length > 1 && i === pts.length-1 ? 'end' : 'middle'}" font-size="11" fill="var(--muted)">${dShort(pts[i].date)}</text>`);
   const lx = pts.length - 1;
-  const uLbl = u === 'placas' ? 'placas' : 'kg';
+  const uLbl = u === 'placas' ? 'placas' : u === 'lb' ? 'lb' : 'kg';
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Progreso del ejercicio">
     ${g}
     <path d="${area}" fill="var(--accent)" fill-opacity=".1" stroke="none"/>
