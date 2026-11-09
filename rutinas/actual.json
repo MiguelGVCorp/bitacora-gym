@@ -1,10 +1,21 @@
 {
  "type": "bitacora-rutina",
  "version": 1,
- "name": "Torso / Pierna 4 días · v2",
- "date": "2026-11-03",
- "notes": "Metas semana 2 (3-7 nov). Un solo peso en todas las series.",
- "exercises": {},
+ "name": "Torso / Pierna 4 días · v3",
+ "date": "2026-11-09",
+ "notes": "Semana 3: aperturas de pecho en ambos torsos, descansos más largos en los básicos. Un solo peso en todas las series.",
+ "exercises": {
+  "aperturas-maquina": {
+   "name": "Aperturas en máquina (pec deck)",
+   "u": "placas",
+   "note": "Codos ligeramente doblados; aprieta el pecho 1 segundo al juntar."
+  },
+  "aperturas-polea": {
+   "name": "Aperturas en polea (cruce)",
+   "u": "placas",
+   "note": "Placas de cada lado. Baja controlado y siente el estiramiento."
+  }
+ },
  "days": [
   {
    "id": "TA",
@@ -14,7 +25,7 @@
     {
      "sets": 4,
      "reps": "8-10",
-     "rest": 90,
+     "rest": 120,
      "vars": [
       "press-banca",
       "press-banca-mancuernas",
@@ -22,9 +33,18 @@
      ]
     },
     {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "aperturas-maquina",
+      "aperturas-polea"
+     ]
+    },
+    {
      "sets": 4,
      "reps": "8-10",
-     "rest": 90,
+     "rest": 120,
      "vars": [
       "remo-barra",
       "remo-polea",
@@ -88,7 +108,7 @@
     {
      "sets": 4,
      "reps": "8-10",
-     "rest": 120,
+     "rest": 150,
      "vars": [
       "sentadilla",
       "hack",
@@ -98,7 +118,7 @@
     {
      "sets": 3,
      "reps": "10-12",
-     "rest": 90,
+     "rest": 120,
      "vars": [
       "prensa"
      ]
@@ -150,7 +170,7 @@
     {
      "sets": 4,
      "reps": "8-10",
-     "rest": 90,
+     "rest": 120,
      "vars": [
       "press-inclinado",
       "press-inclinado-barra",
@@ -158,9 +178,18 @@
      ]
     },
     {
+     "sets": 3,
+     "reps": "12-15",
+     "rest": 60,
+     "vars": [
+      "aperturas-maquina",
+      "aperturas-polea"
+     ]
+    },
+    {
      "sets": 4,
      "reps": "8-10",
-     "rest": 90,
+     "rest": 120,
      "vars": [
       "remo-polea",
       "remo-mancuerna",
@@ -223,7 +252,7 @@
     {
      "sets": 4,
      "reps": "8-10",
-     "rest": 120,
+     "rest": 150,
      "vars": [
       "rumano-barra",
       "rumano-mancuernas"
@@ -232,7 +261,7 @@
     {
      "sets": 3,
      "reps": "10-12",
-     "rest": 90,
+     "rest": 120,
      "vars": [
       "hack",
       "sentadilla",
@@ -279,8 +308,8 @@
    ]
   }
  ],
- "rev": 1,
- "targetsFrom": "2026-11-03",
+ "rev": 2,
+ "targetsFrom": "2026-11-09",
  "targets": {
   "TA": {
    "press-banca": {
@@ -292,7 +321,7 @@
     "r": 10
    },
    "press-militar-maquina": {
-    "w": 30,
+    "w": 35,
     "r": 10
    },
    "jalon-abierto": {
@@ -305,14 +334,14 @@
    },
    "lat-polea": {
     "w": 1,
-    "r": 14
+    "r": 15
    },
    "curl-z": {
     "w": 20,
     "r": 12
    },
    "triceps-cuerda": {
-    "w": 4,
+    "w": 5,
     "r": 12
    }
   },
@@ -323,14 +352,18 @@
    },
    "prensa": {
     "w": 130,
-    "r": 10
+    "r": 12
    },
    "rumano-mancuernas": {
     "w": 32,
-    "r": 12
+    "r": 10
    },
    "curl-fem-acostado": {
     "w": 7,
+    "r": 12
+   },
+   "crunch-polea": {
+    "w": 8,
     "r": 12
    },
    "piernas-colgado": {
@@ -340,7 +373,7 @@
   },
   "TB": {
    "press-inclinado-maquina": {
-    "w": 55,
+    "w": 60,
     "r": 8
    },
    "remo-polea": {
@@ -357,7 +390,7 @@
    },
    "lat-polea": {
     "w": 1,
-    "r": 14
+    "r": 15
    },
    "face-pull": {
     "w": 5,
@@ -365,6 +398,10 @@
    },
    "curl-martillo": {
     "w": 5,
+    "r": 12
+   },
+   "triceps-overhead": {
+    "w": 4,
     "r": 12
    },
    "press-frances": {
@@ -387,6 +424,10 @@
    },
    "curl-fem-sentado": {
     "w": 7,
+    "r": 12
+   },
+   "crunch-polea": {
+    "w": 8,
     "r": 12
    }
   }
