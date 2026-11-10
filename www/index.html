@@ -734,7 +734,7 @@ async function initNative(){
       safe(() => APP.minimizeApp());
     });
     APP.addListener('appStateChange', st => {
-      if (!st || !st.isActive) return;
+      if (!st || !st.isActive){ if (showPhotos){ showPhotos = false; if (view === 'progress') renderProgress(); } return; }
       autoBackup();
       checkRemoteRoutine();
       tick();
@@ -1066,7 +1066,7 @@ document.addEventListener('visibilitychange', () => {
 function countdownTick(){
   const bar = $('#restbar'); bar.classList.remove('cd'); void bar.offsetWidth; bar.classList.add('cd');
   if (document.visibilityState !== 'visible') return;
-  if (RA){ safe(() => RA.tick()); return; }
+  if (RA) return; // los tics también los programa la alarma nativa
   if (HAP) safe(() => HAP.vibrate({duration: 60}));
   if (!actx) return;
   try {
@@ -1383,8 +1383,9 @@ function bodyHTML(){
     </div>
     <h3 style="margin-top:14px">Fotos de progreso</h3>
     <p class="hint">De frente, de lado y de espalda, con la misma luz y a la misma hora. Se guardan solo en tu celular (no van en el respaldo).</p>
-    <div class="row-btns" style="justify-content:flex-start"><button class="btn primary" type="button" id="photoAdd">Agregar fotos de hoy</button>${photos.length ? `<button class="link" type="button" id="photoToggle">${showPhotos ? 'Ocultar' : `Ver todas (${dates.length} ${dates.length === 1 ? 'día' : 'días'})`}</button>` : ''}</div>
-    ${lastSet.length ? `<div class="cmp"><div><small>Inicio · ${dShort(dkParse(dates[0]))}</small>${firstSet.map(imgTag).join('')}</div><div><small>Última · ${dShort(dkParse(dates[dates.length - 1]))}</small>${lastSet.map(imgTag).join('')}</div></div>` : firstSet.length ? `<div class="gal">${firstSet.map(imgTag).join('')}</div>` : ''}
+    <div class="row-btns" style="justify-content:flex-start"><button class="btn primary" type="button" id="photoAdd">Agregar fotos de hoy</button>${photos.length ? `<button class="btn" type="button" id="photoToggle">${showPhotos ? 'Ocultar fotos' : `Ver fotos (${dates.length} ${dates.length === 1 ? 'día' : 'días'})`}</button>` : ''}</div>
+    ${photos.length && !showPhotos ? '<p class="hint">Tus fotos están ocultas. Toca «Ver fotos» para mostrarlas.</p>' : ''}
+    ${!showPhotos ? '' : lastSet.length ? `<div class="cmp"><div><small>Inicio · ${dShort(dkParse(dates[0]))}</small>${firstSet.map(imgTag).join('')}</div><div><small>Última · ${dShort(dkParse(dates[dates.length - 1]))}</small>${lastSet.map(imgTag).join('')}</div></div>` : firstSet.length ? `<div class="gal">${firstSet.map(imgTag).join('')}</div>` : ''}
     ${showPhotos ? dates.slice().reverse().map(dd => `<div class="gal-d"><small>${dShort(dkParse(dd))}</small><div class="gal">${photos.filter(p => p.date === dd).map(p => `<span class="ph">${imgTag(p)}<button class="x sm" type="button" data-phdel="${esc(p.id)}" aria-label="Borrar foto">✕</button></span>`).join('')}</div></div>`).join('') : ''}
   </section>`;
 }
@@ -2208,6 +2209,7 @@ function switchView(v){
   if (v === 'train') renderTrain();
   if (v === 'food'){ foodDay = foodDay > dk(Date.now()) ? dk(Date.now()) : foodDay; renderFood(); }
   if (v === 'history') renderHistory();
+  if (v !== 'progress') showPhotos = false;
   if (v === 'progress') renderProgress();
   window.scrollTo({top:0});
 }
