@@ -1957,6 +1957,10 @@ async function calcFood(){
 - Si no da cantidades, usa porciones típicas en México (taco de taquería, tortilla de maíz, bolillo, refresco de 600 ml, etc.).
 - Desglosa por alimento o bebida. Incluye aceite, salsas, crema o queso solo si lo menciona o si el platillo normalmente los lleva.
 - qty: la cantidad en formato "250 g", "200 ml" o "3 piezas" (usa piezas para huevos, tortillas, tostadas, tacos, pan, fruta entera).
+- Pesos de carne: esta persona pesa el pollo, la res, el cerdo y el pescado EN CRUDO. Si da gramos de alguno y no dice "cocido", "asado", "frito" o que es de restaurante, usa valores en crudo (pechuga de pollo cruda = 120 kcal por 100 g). Si dice cocido, usa valores de cocido.
+- El arroz, la pasta y los frijoles los pesa ya cocidos, salvo que diga "crudo".
+- Si el texto trae datos de una etiqueta (kcal, proteína, etc.), úsalos tal cual.
+- Valores de referencia por 100 g: pechuga de pollo cruda 120 kcal, 22.5 p, 0 c, 2.6 f · pechuga cocida 165 kcal, 31 p, 0 c, 3.6 f · arroz blanco cocido 130 kcal, 2.7 p, 28 c, 0.3 f · atún en agua escurrido 116 kcal, 26 p, 0 c, 1 f · leche entera (100 ml) 61 kcal, 3.2 p, 4.8 c, 3.3 f · queso panela 250 kcal, 18 p, 3 c, 18 f. Por pieza: huevo 72 kcal, 6.3 p, 0.4 c, 4.8 f · tortilla de maíz 52 kcal, 1.4 p, 11 c, 0.7 f · ½ aguacate mediano 120 kcal, 1.5 p, 6 c, 11 f.
 - Números enteros. kcal = calorías, p = proteína en g, c = carbohidratos en g, f = grasa en g.
 Responde SOLO con JSON con esta forma:
 {"items":[{"name":"Taco al pastor","qty":"3 piezas","kcal":450,"p":24,"c":42,"f":21}],"note":"un supuesto breve que hiciste, o vacío"}
@@ -2208,6 +2212,34 @@ function switchView(v){
   window.scrollTo({top:0});
 }
 document.querySelector('.tabs').addEventListener('click', e => { const v = e.target.dataset.view; if (v) switchView(v); });
+
+/* Alimentos base y corrección del pollo (antes se contaba crudo con valores de cocido) */
+(function fixFoodData(){
+  try {
+    const seeds = [{name: 'Pechuga de pollo cruda', unit: 'g', kcal: 120, p: 22.5, c: 0, f: 2.6},
+                   {name: 'Arroz blanco cocido', unit: 'g', kcal: 130, p: 2.7, c: 28, f: 0.3}];
+    S.seeded = S.seeded || [];
+    seeds.forEach(f => { const k = norm(f.name); if (!S.seeded.includes(k)){ if (!S.food.foods[k] && !(S.food.hidden || []).includes(k)) S.food.foods[k] = f; S.seeded.push(k); } });
+    if (S.migr !== 'pollo-crudo-1'){
+      let n = 0;
+      Object.entries(S.food.days || {}).forEach(([k, doc]) => {
+        let changed = false;
+        (doc.entries || []).forEach(e => (e.items || []).forEach(i => {
+          const name = String(i.name || ''), m = String(i.qty || '').match(/^\s*(\d+(?:[.,]\d+)?)\s*g\b/i);
+          if (!/pechuga de pollo/i.test(name) || !m) return;
+          if (/cocid|asad|frit/i.test(name) && !/crud/i.test(name)) return;
+          const g = num(m[1]); if (!g || (+i.kcal || 0) / g <= 1.4) return;
+          Object.assign(i, {name: 'Pechuga de pollo cruda', kcal: Math.round(1.2 * g), p: Math.round(0.225 * g), c: 0, f: Math.round(0.026 * g)});
+          if (i.base) i.base = {kcal: i.kcal, p: i.p, c: i.c, f: i.f};
+          changed = true; n++;
+        }));
+        if (changed) putDay(k, doc);
+      });
+      S.migr = 'pollo-crudo-1'; saveLocal();
+      if (n) setTimeout(() => toast(`Corregí el pollo en ${n} ${n === 1 ? 'registro' : 'registros'}: ahora cuenta como pesado en crudo`), 1200);
+    }
+  } catch(e){ console.warn('fixFoodData', e); }
+})();
 
 setStatus(); renderTrain();
 if (S.draft && S.draft.start) requestWake();
