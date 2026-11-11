@@ -1022,7 +1022,7 @@ function saveRest(){ S.rest = rest; saveLocal(); }
 async function scheduleRestNotif(){
   if (!RA) return;
   if (!rest || rest.end <= Date.now() + 300){ await safe(() => RA.cancel()); return; }
-  await safe(() => RA.schedule({at: rest.end}));
+  await safe(() => RA.schedule({at: rest.end, label: rest.label || ''}));
 }
 function startRest(sec, label){ rest = {end: Date.now() + sec*1000, total: sec, label, beeped: false}; $('#restbar').classList.add('show'); $('#restbar').classList.remove('over'); saveRest(); scheduleRestNotif(); tick(); }
 function stopRest(){ const had = !!rest; rest = null; $('#restbar').classList.remove('show','over'); if (had) saveRest(); if (RA) safe(() => RA.cancel()); }
@@ -1041,7 +1041,7 @@ $('#restbar').addEventListener('click', onRestTap);
 let actx = null;
 function unlockAudio(){ try { actx = actx || new (window.AudioContext || window.webkitAudioContext)(); if (actx.state === 'suspended') actx.resume(); } catch(e){} }
 function beep(){
-  if (RA) return; // la alarma nativa ya suena y vibra a la hora exacta
+  if (RA){ if (document.visibilityState === 'visible') safe(() => RA.done()); return; } // con la pantalla bloqueada suena el servicio nativo
   if (HAP) safe(() => HAP.vibrate({duration: 450}));
   try {
     if (actx){
@@ -1066,7 +1066,7 @@ document.addEventListener('visibilitychange', () => {
 function countdownTick(){
   const bar = $('#restbar'); bar.classList.remove('cd'); void bar.offsetWidth; bar.classList.add('cd');
   if (document.visibilityState !== 'visible') return;
-  if (RA) return; // los tics también los programa la alarma nativa
+  if (RA){ safe(() => RA.tick()); return; }
   if (HAP) safe(() => HAP.vibrate({duration: 60}));
   if (!actx) return;
   try {
@@ -1086,7 +1086,7 @@ function tick(){
     $('#restBar').style.width = Math.min(100, Math.max(0, 100 - left/rest.total*100)) + '%';
     const sec = Math.ceil(left);
     if (left > 0 && sec <= 3 && rest.cd !== sec){ rest.cd = sec; countdownTick(); }
-    if (left <= 0 && !rest.beeped){ rest.beeped = true; $('#restbar').classList.add('over'); beep(); }
+    if (left <= 0 && !rest.beeped){ rest.beeped = true; $('#restbar').classList.add('over'); if (left > -1.5) beep(); }
     if (left < -20) stopRest();
   }
 }
