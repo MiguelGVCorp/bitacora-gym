@@ -885,7 +885,7 @@ function renderTrain(){
         const p = prev && prev.sets[Math.min(i, prev.sets.length-1)];
         return `<div class="set${s.done ? ' done' : ''}" data-i="${i}">
           <span class="n">${i+1}</span>
-          <input type="number" inputmode="${U.im}" step="${U.step}" min="0" id="w-${sl.key}-${i}" data-f="w" value="${esc(s.w)}" placeholder="${wPh(p)}" aria-label="${U.head} serie ${i+1}">
+          <input type="${U.im === 'decimal' ? 'text' : 'number'}" inputmode="${U.im}" autocomplete="off" step="${U.step}" min="0" id="w-${sl.key}-${i}" data-f="w" value="${esc(s.w)}" placeholder="${wPh(p)}" aria-label="${U.head} serie ${i+1}">
           <input type="number" inputmode="numeric" step="1" min="0" id="r-${sl.key}-${i}" data-f="r" value="${esc(s.r)}" placeholder="${tgt && tgt.r != null ? tgt.r : p && p.r != null ? p.r : esc(sl.reps)}" aria-label="Repeticiones serie ${i+1}">
           <button class="check" type="button" aria-label="Marcar serie ${i+1}" aria-pressed="${s.done}">✓</button>
         </div>`;}).join('')}
@@ -1751,7 +1751,7 @@ function plateHTML(){
   plate = plate.filter(l => lib[l.key]);
   const rows = plate.map((l, i) => { const f = lib[l.key]; return `<div class="pl-row">
       <div class="pv-name"><b>${esc(f.name)}</b><small>${r0(f.kcal)} kcal por ${UNIT_LBL[f.unit]}</small></div>
-      <div class="pl-q"><input type="number" inputmode="decimal" min="0" step="${f.unit === 'g' ? 5 : 0.5}" id="pl-${i}" data-pln="${i}" value="${l.n ?? ''}" aria-label="Cantidad de ${esc(f.name)}"><span>${f.unit === 'g' ? 'g' : f.unit === 'pz' ? 'pz' : 'porc'}</span></div>
+      <div class="pl-q"><input type="text" inputmode="decimal" autocomplete="off" min="0" step="${f.unit === 'g' ? 5 : 0.5}" id="pl-${i}" data-pln="${i}" value="${l.n ?? ''}" aria-label="Cantidad de ${esc(f.name)}"><span>${f.unit === 'g' ? 'g' : f.unit === 'pz' ? 'pz' : 'porc'}</span></div>
       <b class="pl-k" id="plk-${i}">${itemFrom(f, l.n || 0).kcal}</b>
       <button class="x" type="button" data-pldel="${i}" aria-label="Quitar ${esc(f.name)}">✕</button>
     </div>`; }).join('');
@@ -1776,12 +1776,12 @@ function newFoodHTML(){
     <h4>${f ? 'Editar alimento' : 'Nuevo alimento'}</h4>
     <div class="form-grid">
       <label for="nf-name" class="wide">Nombre<input id="nf-name" type="text" value="${f ? esc(f.name) : ''}" placeholder="Ej. Yogurt griego natural"></label>
-      <label for="nf-ref">Los datos son por<input id="nf-ref" type="number" inputmode="decimal" min="0" value="${u === 'pz' ? 1 : 100}"></label>
+      <label for="nf-ref">Los datos son por<input id="nf-ref" type="text" inputmode="decimal" autocomplete="off" min="0" value="${u === 'pz' ? 1 : 100}"></label>
       <label for="nf-unit">Unidad<select id="nf-unit"><option value="g" ${u === 'g' ? 'selected' : ''}>gramos o ml</option><option value="pz" ${u === 'pz' ? 'selected' : ''}>piezas</option></select></label>
-      <label for="nf-kcal">Calorías<input id="nf-kcal" type="number" inputmode="decimal" min="0" value="${f ? v(f.kcal) : ''}"></label>
-      <label for="nf-p">Proteína (g)<input id="nf-p" type="number" inputmode="decimal" min="0" value="${f ? v(f.p) : ''}"></label>
-      <label for="nf-c">Carbos (g)<input id="nf-c" type="number" inputmode="decimal" min="0" value="${f ? v(f.c) : ''}"></label>
-      <label for="nf-f">Grasa (g)<input id="nf-f" type="number" inputmode="decimal" min="0" value="${f ? v(f.f) : ''}"></label>
+      <label for="nf-kcal">Calorías<input id="nf-kcal" type="text" inputmode="decimal" autocomplete="off" min="0" value="${f ? v(f.kcal) : ''}"></label>
+      <label for="nf-p">Proteína (g)<input id="nf-p" type="text" inputmode="decimal" autocomplete="off" min="0" value="${f ? v(f.p) : ''}"></label>
+      <label for="nf-c">Carbos (g)<input id="nf-c" type="text" inputmode="decimal" autocomplete="off" min="0" value="${f ? v(f.c) : ''}"></label>
+      <label for="nf-f">Grasa (g)<input id="nf-f" type="text" inputmode="decimal" autocomplete="off" min="0" value="${f ? v(f.f) : ''}"></label>
     </div>
     <p class="hint">Copia la tabla nutrimental tal como viene. Si dice "por porción de 150 g", escribe 150 en "Los datos son por".</p>
     <div class="row-btns"><button class="btn" type="button" id="nfCancel">Cancelar</button><button class="btn primary" type="button" id="nfSave">Guardar</button></div>
@@ -1806,7 +1806,7 @@ function setupForm(){
       <label for="f-sex">Sexo<select id="f-sex"><option value="h" ${p.sex !== 'm' ? 'selected' : ''}>Hombre</option><option value="m" ${p.sex === 'm' ? 'selected' : ''}>Mujer</option></select></label>
       <label for="f-age">Edad<input id="f-age" type="number" inputmode="numeric" min="14" max="90" value="${esc(p.age)}" placeholder="años"></label>
       <label for="f-height">Estatura<input id="f-height" type="number" inputmode="numeric" min="120" max="230" value="${esc(p.height)}" placeholder="cm"></label>
-      <label for="f-weight">Peso<input id="f-weight" type="number" inputmode="decimal" step="0.1" min="35" max="250" value="${esc(p.weight)}" placeholder="kg"></label>
+      <label for="f-weight">Peso<input id="f-weight" type="text" inputmode="decimal" autocomplete="off" step="0.1" min="35" max="250" value="${esc(p.weight)}" placeholder="kg"></label>
       <label for="f-act" class="wide">Actividad<select id="f-act">${Object.entries(ACT).map(([k,a]) => `<option value="${k}" ${p.act === k ? 'selected' : ''}>${esc(a.label)}</option>`).join('')}</select></label>
       <label for="f-goal" class="wide">Objetivo<select id="f-goal">${Object.entries(GOALS).map(([k,g]) => `<option value="${k}" ${p.goal === k ? 'selected' : ''}>${esc(g.label)}</option>`).join('')}</select></label>
     </div>
@@ -1862,9 +1862,9 @@ function renderFood(){
     html += `<div class="form-grid">
         <label for="m-name" class="wide">Alimento<input id="m-name" type="text" placeholder="Ej. Tamal, pan y café"></label>
         <label for="m-kcal">Calorías<input id="m-kcal" type="number" inputmode="numeric" min="0" placeholder="kcal"></label>
-        <label for="m-p">Proteína<input id="m-p" type="number" inputmode="decimal" min="0" placeholder="g"></label>
-        <label for="m-c">Carbos<input id="m-c" type="number" inputmode="decimal" min="0" placeholder="g"></label>
-        <label for="m-f">Grasa<input id="m-f" type="number" inputmode="decimal" min="0" placeholder="g"></label>
+        <label for="m-p">Proteína<input id="m-p" type="text" inputmode="decimal" autocomplete="off" min="0" placeholder="g"></label>
+        <label for="m-c">Carbos<input id="m-c" type="text" inputmode="decimal" autocomplete="off" min="0" placeholder="g"></label>
+        <label for="m-f">Grasa<input id="m-f" type="text" inputmode="decimal" autocomplete="off" min="0" placeholder="g"></label>
       </div>
       <div class="row-btns">
         <button class="btn" type="button" id="manualOff">Volver</button>
@@ -1935,7 +1935,7 @@ function renderFood(){
       <h3>Peso</h3>
       <p class="hint" style="margin-top:4px">Pésate en ayunas, después del baño. Lo que cuenta es el promedio semanal, no el número de un día.</p>
       <div class="wrow">
-        <input id="wIn" type="number" inputmode="decimal" step="0.1" min="30" max="300" placeholder="kg" value="${doc.weight ?? ''}" aria-label="Peso del día en kg">
+        <input id="wIn" type="text" inputmode="decimal" autocomplete="off" step="0.1" min="30" max="300" placeholder="kg" value="${doc.weight ?? ''}" aria-label="Peso del día en kg">
         <button class="btn" type="button" id="wSave">${doc.weight ? 'Actualizar' : 'Guardar'}</button>
       </div>
       ${wt && wt.avg ? `<div class="wstats">
