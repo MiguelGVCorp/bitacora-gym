@@ -2,8 +2,8 @@
  "type": "bitacora-rutina",
  "version": 1,
  "name": "Torso / Pierna 4 días · v3",
- "date": "2026-11-09",
- "notes": "Semana 3: aperturas de pecho en ambos torsos, descansos más largos en los básicos. Un solo peso en todas las series.",
+ "date": "2026-11-16",
+ "notes": "Semana 4: sube hack y prensa; jalón a 9 placas en Torso B. Un solo peso en todas las series.",
  "exercises": {
   "aperturas-maquina": {
    "name": "Aperturas en máquina (pec deck)",
@@ -308,20 +308,24 @@
    ]
   }
  ],
- "rev": 2,
- "targetsFrom": "2026-11-09",
+ "rev": 3,
+ "targetsFrom": "2026-11-16",
  "targets": {
   "TA": {
    "press-banca": {
     "w": 40,
     "r": 8
    },
+   "aperturas-maquina": {
+    "w": 8,
+    "r": 10
+   },
    "remo-polea": {
     "w": 10,
     "r": 10
    },
    "press-militar-maquina": {
-    "w": 35,
+    "w": 40,
     "r": 10
    },
    "jalon-abierto": {
@@ -343,16 +347,20 @@
    "triceps-cuerda": {
     "w": 5,
     "r": 12
+   },
+   "triceps-barra-polea": {
+    "w": 7,
+    "r": 12
    }
   },
   "PA": {
    "hack": {
-    "w": 90,
-    "r": 10
+    "w": 100,
+    "r": 8
    },
    "prensa": {
-    "w": 130,
-    "r": 12
+    "w": 140,
+    "r": 10
    },
    "rumano-mancuernas": {
     "w": 32,
@@ -364,7 +372,7 @@
    },
    "crunch-polea": {
     "w": 8,
-    "r": 12
+    "r": 14
    },
    "piernas-colgado": {
     "w": null,
@@ -376,16 +384,20 @@
     "w": 60,
     "r": 8
    },
+   "aperturas-maquina": {
+    "w": 8,
+    "r": 10
+   },
    "remo-polea": {
     "w": 10,
     "r": 10
    },
    "jalon-abierto": {
-    "w": 8,
+    "w": 9,
     "r": 10
    },
    "jalon-neutro": {
-    "w": 8,
+    "w": 9,
     "r": 10
    },
    "lat-polea": {
@@ -397,6 +409,10 @@
     "r": 15
    },
    "curl-martillo": {
+    "w": 5,
+    "r": 12
+   },
+   "curl-martillo-cuerda": {
     "w": 5,
     "r": 12
    },
@@ -415,7 +431,7 @@
     "r": 10
    },
    "hack": {
-    "w": 80,
+    "w": 90,
     "r": 12
    },
    "curl-fem-acostado": {
@@ -428,7 +444,7 @@
    },
    "crunch-polea": {
     "w": 8,
-    "r": 12
+    "r": 14
    }
   }
  }

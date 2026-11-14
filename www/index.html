@@ -1126,7 +1126,7 @@ function summaryText(m){
   const L = [`Resumen Bitácora Gym · semana ${weekRangeLabel(m.w)}`];
   L.push(`Entrenamientos: ${m.ses} de ${m.target}${m.dur ? ` (prom. ${Math.round(m.dur)} min)` : ''}.${m.prs.length ? ' Récords: ' + m.prs.map(p => `${exInfo(p.ex).name} ${fmtSet(p, exInfo(p.ex).u)}`).join(', ') + '.' : ''}`);
   if (m.logged) L.push(`Comida: ${m.logged} días registrados, prom. ${r0(m.kcal).toLocaleString('es-MX')} kcal${m.kcalT ? ` (meta ${m.kcalT.toLocaleString('es-MX')})` : ''}; proteína cumplida ${m.protOk} de ${m.logged} días${m.protT ? ` (meta ${m.protT} g)` : ''}.`);
-  if (m.wt != null) L.push(`Peso: ${m.wt.toFixed(1)} kg prom.${m.wtDiff != null ? ` (${sgn(m.wtDiff)} kg vs semana anterior)` : ''}.`);
+  if (m.wt != null) L.push(`Peso: ${m.wt.toFixed(2)} kg prom.${m.wtDiff != null ? ` (${sgn(m.wtDiff, 2)} kg vs semana anterior)` : ''}.`);
   if (m.stepsN) L.push(`Pasos: ${r0(m.steps).toLocaleString('es-MX')} prom., ${m.stepsOk} de ${m.stepsN} días con ${STEP_GOAL.toLocaleString('es-MX')}+.`);
   return L.join('\n');
 }
@@ -1140,7 +1140,7 @@ function summaryHTML(){
       ${cell(`${m.ses}/${m.target}`, 'entrenamientos')}
       ${cell(m.kcal ? r0(m.kcal).toLocaleString('es-MX') : '–', `kcal prom.${m.kcalT ? ' (meta ' + m.kcalT.toLocaleString('es-MX') + ')' : ''}`)}
       ${cell(m.logged ? `${m.protOk}/${m.logged}` : '–', 'días con tu proteína')}
-      ${cell(m.wt != null ? m.wt.toFixed(1) : '–', `kg prom.${m.wtDiff != null ? ' (' + sgn(m.wtDiff) + ')' : ''}`)}
+      ${cell(m.wt != null ? m.wt.toFixed(2) : '–', `kg prom.${m.wtDiff != null ? ' (' + sgn(m.wtDiff, 2) + ')' : ''}`)}
       ${cell(m.stepsN ? r0(m.steps).toLocaleString('es-MX') : '–', `pasos prom. (${m.stepsOk}/${m.stepsN} con meta)`)}
       ${cell(m.prs.length || '–', 'récords nuevos')}
     </div>
@@ -1377,7 +1377,7 @@ function bodyHTML(){
   return `<section class="card body-card">
     <h3>Peso y fotos</h3>
     <div class="stats">
-      <div class="stat"><b>${wAvg ? wAvg.toFixed(1) : '–'}</b><small>peso prom. 7 días (kg)</small></div>
+      <div class="stat"><b>${wAvg ? wAvg.toFixed(2) : '–'}</b><small>peso prom. 7 días (kg)</small></div>
       <div class="stat"><b>${wPrev != null && wAvg != null ? sgn(wAvg - wPrev) : '–'}</b><small>kg vs semana anterior</small></div>
       <div class="stat"><b>${(S.photos || []).length ? dates.length : '–'}</b><small>días con fotos</small></div>
     </div>
@@ -1935,12 +1935,12 @@ function renderFood(){
       <h3>Peso</h3>
       <p class="hint" style="margin-top:4px">Pésate en ayunas, después del baño. Lo que cuenta es el promedio semanal, no el número de un día.</p>
       <div class="wrow">
-        <input id="wIn" type="text" inputmode="decimal" autocomplete="off" step="0.1" min="30" max="300" placeholder="kg" value="${doc.weight ?? ''}" aria-label="Peso del día en kg">
+        <input id="wIn" type="text" inputmode="decimal" autocomplete="off" step="0.01" min="30" max="300" placeholder="kg" value="${doc.weight ?? ''}" aria-label="Peso del día en kg">
         <button class="btn" type="button" id="wSave">${doc.weight ? 'Actualizar' : 'Guardar'}</button>
       </div>
       ${wt && wt.avg ? `<div class="wstats">
-        <div><b>${wt.avg.toFixed(1)} kg</b><small>promedio 7 días (${wt.n} ${wt.n === 1 ? 'registro' : 'registros'})</small></div>
-        ${wt.prevAvg ? `<div><b>${(wt.avg - wt.prevAvg) > 0 ? '+' : ''}${(wt.avg - wt.prevAvg).toFixed(1)} kg</b><small>vs. semana anterior</small></div>` : ''}
+        <div><b>${wt.avg.toFixed(2)} kg</b><small>promedio 7 días (${wt.n} ${wt.n === 1 ? 'registro' : 'registros'})</small></div>
+        ${wt.prevAvg ? `<div><b>${(wt.avg - wt.prevAvg) > 0 ? '+' : ''}${(wt.avg - wt.prevAvg).toFixed(2)} kg</b><small>vs. semana anterior</small></div>` : ''}
       </div>` : ''}
     </section>
     <p class="hint" style="text-align:center;margin:4px auto 0">Las calorías son estimaciones. Si en 2-3 semanas tu promedio no baja, ajusta la meta.</p>`;
@@ -2176,7 +2176,7 @@ $('#view-food').addEventListener('click', async e => {
     const w = num($('#wIn').value);
     if (!w || w < 30 || w > 300){ toast('Escribe tu peso en kg.'); return; }
     const doc = JSON.parse(JSON.stringify(dayDoc(foodDay)));
-    doc.weight = Math.round(w * 10) / 10; putDay(foodDay, doc);
+    doc.weight = Math.round(w * 100) / 100; putDay(foodDay, doc);
     toast('Peso guardado'); renderFood(); return;
   }
 });
