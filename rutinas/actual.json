@@ -1,451 +1,459 @@
 {
- "type": "bitacora-rutina",
- "version": 1,
- "name": "Torso / Pierna 4 días · v3",
- "date": "2026-11-16",
- "notes": "Semana 4: sube hack y prensa; jalón a 9 placas en Torso B. Un solo peso en todas las series.",
- "exercises": {
-  "aperturas-maquina": {
-   "name": "Aperturas en máquina (pec deck)",
-   "u": "placas",
-   "note": "Codos ligeramente doblados; aprieta el pecho 1 segundo al juntar."
+  "type": "bitacora-rutina",
+  "version": 1,
+  "name": "Torso / Pierna 4 días · v3",
+  "date": "2026-11-23",
+  "notes": "Semana 5: remo sube a 11 placas, prensa a 150, curl Z a 25 lb, crunch a 9. Torso B y Pierna B repiten metas (no se hicieron la semana pasada).",
+  "exercises": {
+    "aperturas-maquina": {
+      "name": "Aperturas en máquina (pec deck)",
+      "u": "placas",
+      "note": "Codos ligeramente doblados; aprieta el pecho 1 segundo al juntar."
+    },
+    "aperturas-polea": {
+      "name": "Aperturas en polea (cruce)",
+      "u": "placas",
+      "note": "Placas de cada lado. Baja controlado y siente el estiramiento."
+    }
   },
-  "aperturas-polea": {
-   "name": "Aperturas en polea (cruce)",
-   "u": "placas",
-   "note": "Placas de cada lado. Baja controlado y siente el estiramiento."
+  "days": [
+    {
+      "id": "TA",
+      "name": "Torso A",
+      "tag": "Lunes",
+      "slots": [
+        {
+          "sets": 4,
+          "reps": "8-10",
+          "rest": 120,
+          "vars": [
+            "press-banca",
+            "press-banca-mancuernas",
+            "press-pecho-maquina"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "aperturas-maquina",
+            "aperturas-polea"
+          ]
+        },
+        {
+          "sets": 4,
+          "reps": "8-10",
+          "rest": 120,
+          "vars": [
+            "remo-barra",
+            "remo-polea",
+            "remo-mancuerna",
+            "remo-maquina"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "10-12",
+          "rest": 90,
+          "vars": [
+            "press-militar",
+            "press-militar-maquina"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "10-12",
+          "rest": 60,
+          "vars": [
+            "jalon-abierto",
+            "jalon-neutro"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "lat-mancuerna",
+            "lat-polea"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "curl-z",
+            "curl-mancuernas",
+            "curl-polea"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "triceps-cuerda",
+            "triceps-barra-polea"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PA",
+      "name": "Pierna A",
+      "tag": "Martes",
+      "slots": [
+        {
+          "sets": 4,
+          "reps": "8-10",
+          "rest": 150,
+          "vars": [
+            "sentadilla",
+            "hack",
+            "sentadilla-smith"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "10-12",
+          "rest": 120,
+          "vars": [
+            "prensa"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "10-12",
+          "rest": 90,
+          "vars": [
+            "rumano-mancuernas",
+            "rumano-barra"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "10-12",
+          "rest": 60,
+          "vars": [
+            "curl-fem-acostado",
+            "curl-fem-sentado"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "crunch-polea",
+            "crunch-maquina",
+            "pantorrilla-pie"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "al fallo",
+          "rest": 60,
+          "vars": [
+            "piernas-colgado",
+            "crunch-inverso"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "TB",
+      "name": "Torso B",
+      "tag": "Jueves",
+      "slots": [
+        {
+          "sets": 4,
+          "reps": "8-10",
+          "rest": 120,
+          "vars": [
+            "press-inclinado",
+            "press-inclinado-barra",
+            "press-inclinado-maquina"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "aperturas-maquina",
+            "aperturas-polea"
+          ]
+        },
+        {
+          "sets": 4,
+          "reps": "8-10",
+          "rest": 120,
+          "vars": [
+            "remo-polea",
+            "remo-mancuerna",
+            "remo-maquina",
+            "remo-barra"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "8-12",
+          "rest": 90,
+          "vars": [
+            "jalon-neutro",
+            "dominadas",
+            "jalon-abierto"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "lat-polea",
+            "lat-mancuerna"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "15",
+          "rest": 60,
+          "vars": [
+            "face-pull"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "curl-martillo",
+            "curl-martillo-cuerda"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "triceps-overhead",
+            "press-frances"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "PB",
+      "name": "Pierna B",
+      "tag": "Viernes",
+      "slots": [
+        {
+          "sets": 4,
+          "reps": "8-10",
+          "rest": 150,
+          "vars": [
+            "rumano-barra",
+            "rumano-mancuernas"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "10-12",
+          "rest": 120,
+          "vars": [
+            "hack",
+            "sentadilla",
+            "sentadilla-smith"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "10-12",
+          "rest": 90,
+          "vars": [
+            "bulgara",
+            "zancadas"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "10-12",
+          "rest": 60,
+          "vars": [
+            "curl-fem-sentado",
+            "curl-fem-acostado"
+          ]
+        },
+        {
+          "sets": 4,
+          "reps": "15-20",
+          "rest": 60,
+          "vars": [
+            "pantorrilla-sentado",
+            "pantorrilla-pie",
+            "pantorrilla-prensa"
+          ]
+        },
+        {
+          "sets": 3,
+          "reps": "12-15",
+          "rest": 60,
+          "vars": [
+            "crunch-polea",
+            "crunch-maquina"
+          ]
+        }
+      ]
+    }
+  ],
+  "rev": 4,
+  "targetsFrom": "2026-11-23",
+  "targets": {
+    "TA": {
+      "press-banca": {
+        "w": 40,
+        "r": 9
+      },
+      "aperturas-maquina": {
+        "w": 8,
+        "r": 12
+      },
+      "remo-polea": {
+        "w": 11,
+        "r": 8
+      },
+      "press-militar-maquina": {
+        "w": 40,
+        "r": 10
+      },
+      "jalon-abierto": {
+        "w": 8,
+        "r": 10
+      },
+      "jalon-neutro": {
+        "w": 8,
+        "r": 10
+      },
+      "lat-polea": {
+        "w": 1,
+        "r": 15
+      },
+      "curl-z": {
+        "w": 25,
+        "r": 10
+      },
+      "triceps-cuerda": {
+        "w": 5,
+        "r": 12
+      },
+      "triceps-barra-polea": {
+        "w": 7,
+        "r": 12
+      }
+    },
+    "PA": {
+      "hack": {
+        "w": 100,
+        "r": 10
+      },
+      "prensa": {
+        "w": 150,
+        "r": 10
+      },
+      "rumano-mancuernas": {
+        "w": 32,
+        "r": 10
+      },
+      "curl-fem-acostado": {
+        "w": 7,
+        "r": 12
+      },
+      "crunch-polea": {
+        "w": 9,
+        "r": 12
+      },
+      "piernas-colgado": {
+        "w": null,
+        "r": 15
+      },
+      "rumano-barra": {
+        "w": 20,
+        "r": 10
+      }
+    },
+    "TB": {
+      "press-inclinado-maquina": {
+        "w": 60,
+        "r": 8
+      },
+      "aperturas-maquina": {
+        "w": 8,
+        "r": 12
+      },
+      "remo-polea": {
+        "w": 11,
+        "r": 8
+      },
+      "jalon-abierto": {
+        "w": 9,
+        "r": 10
+      },
+      "jalon-neutro": {
+        "w": 9,
+        "r": 10
+      },
+      "lat-polea": {
+        "w": 1,
+        "r": 15
+      },
+      "face-pull": {
+        "w": 5,
+        "r": 15
+      },
+      "curl-martillo": {
+        "w": 5,
+        "r": 12
+      },
+      "curl-martillo-cuerda": {
+        "w": 5,
+        "r": 12
+      },
+      "triceps-overhead": {
+        "w": 4,
+        "r": 12
+      },
+      "press-frances": {
+        "w": 20,
+        "r": 12
+      }
+    },
+    "PB": {
+      "rumano-mancuernas": {
+        "w": 32,
+        "r": 10
+      },
+      "hack": {
+        "w": 90,
+        "r": 12
+      },
+      "curl-fem-acostado": {
+        "w": 7,
+        "r": 12
+      },
+      "curl-fem-sentado": {
+        "w": 7,
+        "r": 12
+      },
+      "crunch-polea": {
+        "w": 9,
+        "r": 12
+      },
+      "rumano-barra": {
+        "w": 20,
+        "r": 10
+      }
+    }
   }
- },
- "days": [
-  {
-   "id": "TA",
-   "name": "Torso A",
-   "tag": "Lunes",
-   "slots": [
-    {
-     "sets": 4,
-     "reps": "8-10",
-     "rest": 120,
-     "vars": [
-      "press-banca",
-      "press-banca-mancuernas",
-      "press-pecho-maquina"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "aperturas-maquina",
-      "aperturas-polea"
-     ]
-    },
-    {
-     "sets": 4,
-     "reps": "8-10",
-     "rest": 120,
-     "vars": [
-      "remo-barra",
-      "remo-polea",
-      "remo-mancuerna",
-      "remo-maquina"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "10-12",
-     "rest": 90,
-     "vars": [
-      "press-militar",
-      "press-militar-maquina"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "10-12",
-     "rest": 60,
-     "vars": [
-      "jalon-abierto",
-      "jalon-neutro"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "lat-mancuerna",
-      "lat-polea"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "curl-z",
-      "curl-mancuernas",
-      "curl-polea"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "triceps-cuerda",
-      "triceps-barra-polea"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "PA",
-   "name": "Pierna A",
-   "tag": "Martes",
-   "slots": [
-    {
-     "sets": 4,
-     "reps": "8-10",
-     "rest": 150,
-     "vars": [
-      "sentadilla",
-      "hack",
-      "sentadilla-smith"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "10-12",
-     "rest": 120,
-     "vars": [
-      "prensa"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "10-12",
-     "rest": 90,
-     "vars": [
-      "rumano-mancuernas",
-      "rumano-barra"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "10-12",
-     "rest": 60,
-     "vars": [
-      "curl-fem-acostado",
-      "curl-fem-sentado"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "crunch-polea",
-      "crunch-maquina",
-      "pantorrilla-pie"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "al fallo",
-     "rest": 60,
-     "vars": [
-      "piernas-colgado",
-      "crunch-inverso"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "TB",
-   "name": "Torso B",
-   "tag": "Jueves",
-   "slots": [
-    {
-     "sets": 4,
-     "reps": "8-10",
-     "rest": 120,
-     "vars": [
-      "press-inclinado",
-      "press-inclinado-barra",
-      "press-inclinado-maquina"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "aperturas-maquina",
-      "aperturas-polea"
-     ]
-    },
-    {
-     "sets": 4,
-     "reps": "8-10",
-     "rest": 120,
-     "vars": [
-      "remo-polea",
-      "remo-mancuerna",
-      "remo-maquina",
-      "remo-barra"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "8-12",
-     "rest": 90,
-     "vars": [
-      "jalon-neutro",
-      "dominadas",
-      "jalon-abierto"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "lat-polea",
-      "lat-mancuerna"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "15",
-     "rest": 60,
-     "vars": [
-      "face-pull"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "curl-martillo",
-      "curl-martillo-cuerda"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "triceps-overhead",
-      "press-frances"
-     ]
-    }
-   ]
-  },
-  {
-   "id": "PB",
-   "name": "Pierna B",
-   "tag": "Viernes",
-   "slots": [
-    {
-     "sets": 4,
-     "reps": "8-10",
-     "rest": 150,
-     "vars": [
-      "rumano-barra",
-      "rumano-mancuernas"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "10-12",
-     "rest": 120,
-     "vars": [
-      "hack",
-      "sentadilla",
-      "sentadilla-smith"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "10-12",
-     "rest": 90,
-     "vars": [
-      "bulgara",
-      "zancadas"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "10-12",
-     "rest": 60,
-     "vars": [
-      "curl-fem-sentado",
-      "curl-fem-acostado"
-     ]
-    },
-    {
-     "sets": 4,
-     "reps": "15-20",
-     "rest": 60,
-     "vars": [
-      "pantorrilla-sentado",
-      "pantorrilla-pie",
-      "pantorrilla-prensa"
-     ]
-    },
-    {
-     "sets": 3,
-     "reps": "12-15",
-     "rest": 60,
-     "vars": [
-      "crunch-polea",
-      "crunch-maquina"
-     ]
-    }
-   ]
-  }
- ],
- "rev": 3,
- "targetsFrom": "2026-11-16",
- "targets": {
-  "TA": {
-   "press-banca": {
-    "w": 40,
-    "r": 8
-   },
-   "aperturas-maquina": {
-    "w": 8,
-    "r": 10
-   },
-   "remo-polea": {
-    "w": 10,
-    "r": 10
-   },
-   "press-militar-maquina": {
-    "w": 40,
-    "r": 10
-   },
-   "jalon-abierto": {
-    "w": 8,
-    "r": 10
-   },
-   "jalon-neutro": {
-    "w": 8,
-    "r": 10
-   },
-   "lat-polea": {
-    "w": 1,
-    "r": 15
-   },
-   "curl-z": {
-    "w": 20,
-    "r": 12
-   },
-   "triceps-cuerda": {
-    "w": 5,
-    "r": 12
-   },
-   "triceps-barra-polea": {
-    "w": 7,
-    "r": 12
-   }
-  },
-  "PA": {
-   "hack": {
-    "w": 100,
-    "r": 8
-   },
-   "prensa": {
-    "w": 140,
-    "r": 10
-   },
-   "rumano-mancuernas": {
-    "w": 32,
-    "r": 10
-   },
-   "curl-fem-acostado": {
-    "w": 7,
-    "r": 12
-   },
-   "crunch-polea": {
-    "w": 8,
-    "r": 14
-   },
-   "piernas-colgado": {
-    "w": null,
-    "r": 15
-   }
-  },
-  "TB": {
-   "press-inclinado-maquina": {
-    "w": 60,
-    "r": 8
-   },
-   "aperturas-maquina": {
-    "w": 8,
-    "r": 10
-   },
-   "remo-polea": {
-    "w": 10,
-    "r": 10
-   },
-   "jalon-abierto": {
-    "w": 9,
-    "r": 10
-   },
-   "jalon-neutro": {
-    "w": 9,
-    "r": 10
-   },
-   "lat-polea": {
-    "w": 1,
-    "r": 15
-   },
-   "face-pull": {
-    "w": 5,
-    "r": 15
-   },
-   "curl-martillo": {
-    "w": 5,
-    "r": 12
-   },
-   "curl-martillo-cuerda": {
-    "w": 5,
-    "r": 12
-   },
-   "triceps-overhead": {
-    "w": 4,
-    "r": 12
-   },
-   "press-frances": {
-    "w": 20,
-    "r": 12
-   }
-  },
-  "PB": {
-   "rumano-mancuernas": {
-    "w": 32,
-    "r": 10
-   },
-   "hack": {
-    "w": 90,
-    "r": 12
-   },
-   "curl-fem-acostado": {
-    "w": 7,
-    "r": 12
-   },
-   "curl-fem-sentado": {
-    "w": 7,
-    "r": 12
-   },
-   "crunch-polea": {
-    "w": 8,
-    "r": 14
-   }
-  }
- }
 }
