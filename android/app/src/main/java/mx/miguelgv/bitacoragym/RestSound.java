@@ -60,6 +60,23 @@ public final class RestSound {
 
     public static void done(Context ctx) { done(ctx, null); }
 
+    private static volatile long lastDone = 0, lastTick = 0;
+
+    /** Igual que done(), pero ignora una segunda llamada casi simultánea (app y servicio a la vez). */
+    public static void doneOnce(Context ctx) {
+        long now = System.currentTimeMillis();
+        if (now - lastDone < 2000) return;
+        lastDone = now;
+        done(ctx, null);
+    }
+
+    public static void tickOnce(Context ctx) {
+        long now = System.currentTimeMillis();
+        if (now - lastTick < 500) return;
+        lastTick = now;
+        tick(ctx);
+    }
+
     /** Cuenta regresiva 3-2-1: un tic corto. */
     public static void tick(Context ctx) {
         play(ctx, R.raw.tic, new long[]{0, 40});

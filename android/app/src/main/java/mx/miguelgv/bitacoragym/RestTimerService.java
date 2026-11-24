@@ -48,15 +48,17 @@ public class RestTimerService extends Service {
         Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(this, CHANNEL) : new Notification.Builder(this);
         b.setSmallIcon(android.R.drawable.ic_lock_idle_alarm)
          .setContentTitle(label == null || label.isEmpty() ? "Descanso" : "Descanso · " + label)
-         .setContentText("Te aviso con sonido al terminar")
+         .setContentText("Suena al terminar, aunque bloquees el celular")
          .setContentIntent(pi)
          .setOngoing(true)
          .setOnlyAlertOnce(true)
          .setShowWhen(true)
          .setWhen(end)
          .setUsesChronometer(true)
-         .setCategory(Notification.CATEGORY_STOPWATCH);
+         .setCategory(Notification.CATEGORY_STOPWATCH)
+         .setVisibility(Notification.VISIBILITY_PUBLIC);
         if (Build.VERSION.SDK_INT >= 24) b.setChronometerCountDown(true);
+        if (Build.VERSION.SDK_INT >= 31) b.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE);
         if (Build.VERSION.SDK_INT < 26) b.setPriority(Notification.PRIORITY_LOW);
         return b.build();
     }
@@ -86,10 +88,10 @@ public class RestTimerService extends Service {
         wl.acquire(end - now + 6000);
         for (int k = 3; k >= 1; k--) {
             long at = end - k * 1000L - now;
-            if (at > 300) h.postDelayed(() -> { if (!RestAlarmPlugin.visible) RestSound.tick(getApplicationContext()); }, at);
+            if (at > 300) h.postDelayed(() -> { if (!RestAlarmPlugin.visible) RestSound.tickOnce(getApplicationContext()); }, at);
         }
         h.postDelayed(() -> {
-            if (!RestAlarmPlugin.visible) RestSound.done(getApplicationContext());
+            if (!RestAlarmPlugin.visible) RestSound.doneOnce(getApplicationContext());
             h.postDelayed(this::stopNow, 2500);
         }, end - now);
         return START_NOT_STICKY;

@@ -6,6 +6,12 @@
 - Progreso: cintura semanal con gráfica, fotos de progreso con comparación inicio/última, resumen de la semana compartible y recordatorios (peso, pasos, cintura y fotos, resumen y respaldo).
 - Datos: copia automática semanal en Documentos/BitacoraGym del celular (se conservan las 4 más recientes).
 
+## Hecho en la versión 2.5 (24 nov 2026)
+- Temporizador: ya arranca el servicio en segundo plano (antes fallaba al leer la hora y nunca iniciaba). Muestra la cuenta regresiva en la barra de notificaciones y suena con la pantalla bloqueada.
+- Comida: peso y pasos arriba, proteína destacada con sugerencia, tiempos de comida en una fila y según la hora, sin "Guardar como planeado", pregunta de madrugada ("¿fue ayer?").
+- Mis alimentos: botón para guardar cada resultado; lo guardado manda sobre el cálculo de la IA.
+- Progreso: resumen semanal con veredicto y gráfica de peso promedio por semana (antes estaba en Historial).
+
 ## Pendiente
 - **Copia automática a Google Drive**: requiere crear un cliente OAuth de Google (Google Cloud Console, con la huella SHA-1 de la llave de firma) para que la app pueda iniciar sesión con Google y subir archivos. Mientras tanto: recordatorio del domingo + Exportar respaldo → Drive.
 

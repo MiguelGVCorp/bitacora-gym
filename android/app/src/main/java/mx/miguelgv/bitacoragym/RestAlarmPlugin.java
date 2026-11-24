@@ -1,13 +1,18 @@
 package mx.miguelgv.bitacoragym;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 
+import com.getcapacitor.JSObject;
+import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
 import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
+import com.getcapacitor.annotation.Permission;
+import com.getcapacitor.annotation.PermissionCallback;
 
 /**
  * Temporizador de descanso.
@@ -15,7 +20,10 @@ import com.getcapacitor.annotation.CapacitorPlugin;
  * Con la pantalla bloqueada o la app en segundo plano, los toca RestTimerService,
  * un servicio en primer plano que se mantiene despierto solo mientras dura el descanso.
  */
-@CapacitorPlugin(name = "RestAlarm")
+@CapacitorPlugin(
+    name = "RestAlarm",
+    permissions = { @Permission(alias = "avisos", strings = { Manifest.permission.POST_NOTIFICATIONS }) }
+)
 public class RestAlarmPlugin extends Plugin {
     static volatile boolean visible = true;
 
@@ -25,19 +33,39 @@ public class RestAlarmPlugin extends Plugin {
 
     @PluginMethod
     public void schedule(PluginCall call) {
-        Double at = call.getDouble("at");
-        if (at == null) { call.reject("Falta 'at'"); return; }
+        // La hora llega en milisegundos (un número largo). call.getDouble() devuelve null con números
+        // largos, por eso antes el servicio nunca arrancaba; se lee directo del JSON.
+        long at = (long) call.getData().optDouble("at", 0);
+        if (at <= 0) { call.reject("Falta 'at'"); return; }
         Context ctx = getContext();
         Intent i = new Intent(ctx, RestTimerService.class);
         i.setAction(RestTimerService.ACTION_START);
-        i.putExtra("end", at.longValue());
+        i.putExtra("end", at);
         i.putExtra("label", call.getString("label", ""));
         try {
             if (Build.VERSION.SDK_INT >= 26) ctx.startForegroundService(i); else ctx.startService(i);
-            call.resolve();
+            JSObject r = new JSObject();
+            r.put("ok", true);
+            call.resolve(r);
         } catch (Exception e) {
             call.reject("No se pudo iniciar el temporizador: " + e.getMessage());
         }
+    }
+
+    /** Pide permiso para mostrar la cuenta regresiva en la barra de notificaciones (Android 13 o más nuevo). */
+    @PluginMethod
+    public void askNotif(PluginCall call) {
+        if (Build.VERSION.SDK_INT < 33 || getPermissionState("avisos") == PermissionState.GRANTED) { notifResult(call); return; }
+        requestPermissionForAlias("avisos", call, "notifDone");
+    }
+
+    @PermissionCallback
+    private void notifDone(PluginCall call) { notifResult(call); }
+
+    private void notifResult(PluginCall call) {
+        JSObject r = new JSObject();
+        r.put("granted", Build.VERSION.SDK_INT < 33 || getPermissionState("avisos") == PermissionState.GRANTED);
+        call.resolve(r);
     }
 
     @PluginMethod
@@ -49,13 +77,13 @@ public class RestAlarmPlugin extends Plugin {
 
     @PluginMethod
     public void tick(PluginCall call) {
-        RestSound.tick(getContext());
+        RestSound.tickOnce(getContext());
         call.resolve();
     }
 
     @PluginMethod
     public void done(PluginCall call) {
-        RestSound.done(getContext());
+        RestSound.doneOnce(getContext());
         call.resolve();
     }
 
